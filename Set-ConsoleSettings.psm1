@@ -236,22 +236,6 @@ function Add-BasicColors
 		$Script:ColorMap[$color].Tokens += $token
 	}
 }
-function Add-OhMyPoshColors
-{
-	<#
-		.SYNOPSIS
-		Adds Oh-My-Posh colors.
-		.DESCRIPTION
-		Adds Oh-My-Posh module token colors to color map.
-	#>
-	if (Get-Module Oh-My-Posh)
-	{
-		foreach ($token in ($ThemeSettings.Colors.GetEnumerator() | ForEach-Object { $_.Name -replace "(.+)Color", "$1" })) {
-			$color = Invoke-Expression "`$ThemeSettings.Colors.$($token)Color.ToString()"
-			$Script:ColorMap[$color].Tokens += $token
-		}
-	}
-}
 function Add-PSReadLineColors
 {
 	<#
@@ -845,7 +829,7 @@ function Show-ANSIColors
 	}
 	Write-Host "`n"
 }
-function Show-ConsoleColors([switch]$Basic, [switch]$OhMyPosh, [switch]$PsReadLine)
+function Show-ConsoleColors([switch]$Basic, [switch]$PsReadLine)
 {
 	<#
 		.SYNOPSIS
@@ -854,15 +838,12 @@ function Show-ConsoleColors([switch]$Basic, [switch]$OhMyPosh, [switch]$PsReadLi
 		Shows the current console colors and, optionally, the colors specified to the different tokens.
 		.PARAMETER basic
 		A value indicating whether to show the colors of the basic tokens.
-		.PARAMETER OhMyPosh
-		A value indicating whether to show the colors of the Oh-My-Posh tokens.
 		.PARAMETER PsReadLine
 		A value indicating whether to show the colors of the PSReadline tokens.
 	#>
 	Clear-Tokens
-	$all = -not $Basic -and -not $OhMyPosh -and -not $PsReadLine
+	$all = -not $Basic -and -not $PsReadLine
 	if ($all -or $Basic) { Add-BasicColors }
-	if ($all -or $OhMyPosh) { Add-OhMyPoshColors }
 	if ($all -or $PsReadLine) { Add-PSReadLineColors }
 	$e = [char]27
 	$Script:ColorMap.GetEnumerator() | Sort-Object { $_.Value.Cmd.Index } | Format-Table @{
