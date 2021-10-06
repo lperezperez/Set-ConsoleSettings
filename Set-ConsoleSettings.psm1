@@ -4,8 +4,8 @@ $Script:ColorMap = @{
 	"Black" = @{
 		"ANSI" = @{
 			"Name" = "Black"
-			"FG"   = "30"
-			"BG"   = "40"
+			"FG" = "30"
+			"BG" = "40"
 		}
 		"Cmd" = @{
 			"Name" = "Black"
@@ -16,8 +16,8 @@ $Script:ColorMap = @{
 	"DarkBlue" = @{
 		"ANSI" = @{
 			"Name" = "Blue"
-			"FG"   = "34"
-			"BG"   = "44"
+			"FG" = "34"
+			"BG" = "44"
 		}
 		"Cmd" = @{
 			"Name" = "Blue"
@@ -28,8 +28,8 @@ $Script:ColorMap = @{
 	"DarkGreen" = @{
 		"ANSI" = @{
 			"Name" = "Green"
-			"FG"   = "32"
-			"BG"   = "42"
+			"FG" = "32"
+			"BG" = "42"
 		}
 		"Cmd" = @{
 			"Name" = "Green"
@@ -40,8 +40,8 @@ $Script:ColorMap = @{
 	"DarkCyan" = @{
 		"ANSI" = @{
 			"Name" = "Cyan"
-			"FG"   = "36"
-			"BG"   = "46"
+			"FG" = "36"
+			"BG" = "46"
 		}
 		"Cmd" = @{
 			"Name" = "Aqua"
@@ -52,8 +52,8 @@ $Script:ColorMap = @{
 	"DarkRed" = @{
 		"ANSI" = @{
 			"Name" = "Red"
-			"FG"   = "31"
-			"BG"   = "41"
+			"FG" = "31"
+			"BG" = "41"
 		}
 		"Cmd" = @{
 			"Name" = "Red"
@@ -64,8 +64,8 @@ $Script:ColorMap = @{
 	"DarkMagenta" = @{
 		"ANSI" = @{
 			"Name" = "Magenta"
-			"FG"   = "35"
-			"BG"   = "45"
+			"FG" = "35"
+			"BG" = "45"
 		}
 		"Cmd" = @{
 			"Name" = "Purple"
@@ -76,8 +76,8 @@ $Script:ColorMap = @{
 	"DarkYellow" = @{
 		"ANSI" = @{
 			"Name" = "Yellow"
-			"FG"   = "33"
-			"BG"   = "43"
+			"FG" = "33"
+			"BG" = "43"
 		}
 		"Cmd" = @{
 			"Name" = "Yellow"
@@ -88,8 +88,8 @@ $Script:ColorMap = @{
 	"Gray" = @{
 		"ANSI" = @{
 			"Name" = "White"
-			"FG"   = "37"
-			"BG"   = "47"
+			"FG" = "37"
+			"BG" = "47"
 		}
 		"Cmd" = @{
 			"Name" = "White"
@@ -100,8 +100,8 @@ $Script:ColorMap = @{
 	"DarkGray" = @{
 		"ANSI" = @{
 			"Name" = "Bright Black"
-			"FG"   = "90"
-			"BG"   = "100"
+			"FG" = "90"
+			"BG" = "100"
 		}
 		"Cmd" = @{
 			"Name" = "Gray"
@@ -112,8 +112,8 @@ $Script:ColorMap = @{
 	"Blue" = @{
 		"ANSI" = @{
 			"Name" = "Bright Blue"
-			"FG"   = "94"
-			"BG"   = "104"
+			"FG" = "94"
+			"BG" = "104"
 		}
 		"Cmd" = @{
 			"Name" = "Light Blue"
@@ -124,8 +124,8 @@ $Script:ColorMap = @{
 	"Green" = @{
 		"ANSI" = @{
 			"Name" = "Bright Green"
-			"FG"   = "92"
-			"BG"   = "102"
+			"FG" = "92"
+			"BG" = "102"
 		}
 		"Cmd" = @{
 			"Name" = "Light Green"
@@ -136,8 +136,8 @@ $Script:ColorMap = @{
 	"Cyan" = @{
 		"ANSI" = @{
 			"Name" = "Bright Cyan"
-			"FG"   = "96"
-			"BG"   = "106"
+			"FG" = "96"
+			"BG" = "106"
 		}
 		"Cmd" = @{
 			"Name" = "Light Aqua"
@@ -148,8 +148,8 @@ $Script:ColorMap = @{
 	"Red" = @{
 			"ANSI" = @{
 				"Name" = "Bright Red"
-				"FG"   = "91"
-				"BG"   = "101"
+				"FG" = "91"
+				"BG" = "101"
 			}
 			"Cmd" = @{
 				"Name" = "Light Red"
@@ -160,8 +160,8 @@ $Script:ColorMap = @{
 	"Magenta" = @{
 		"ANSI" = @{
 			"Name" = "Bright Magenta"
-			"FG"   = "95"
-			"BG"   = "105"
+			"FG" = "95"
+			"BG" = "105"
 		}
 		"Cmd" = @{
 			"Name" = "Light Purple"
@@ -172,8 +172,8 @@ $Script:ColorMap = @{
 	"Yellow" = @{
 		"ANSI" = @{
 			"Name" = "Bright Yellow"
-			"FG"   = "93"
-			"BG"   = "103"
+			"FG" = "93"
+			"BG" = "103"
 		}
 		"Cmd" = @{
 			"Name" = "Light Yellow"
@@ -184,8 +184,8 @@ $Script:ColorMap = @{
 	"White" = @{
 		"ANSI" = @{
 			"Name" = "Bright White"
-			"FG"   = "97"
-			"BG"   = "107"
+			"FG" = "97"
+			"BG" = "107"
 		}
 		"Cmd" = @{
 			"Name" = "Bright White"
@@ -194,27 +194,27 @@ $Script:ColorMap = @{
 		"Tokens" = @()
 	}
 }
-$Script:FontName = '' # Font name
+$Script:FontName = "" # Font name
 # ─── Maps console registry setting types ──────────────────────────────────────
 $Script:TypeMap = @{
-	"CursorSize"             = "cursor"    # Specifies the percentage of a character cell that is occupied by the cursor. This setting affects the default window. Values: Small (25%), Medium (50%) or Large (100%).
-	"FaceName"               = "string"    # Specifies the name of an alternate command window font. If there is no font name in the value of this entry, the system uses raster fonts.
-	"FontFamily"             = "font_type" # Specifies whether the font is True Type.
-	"FontSize"               = "dim"       # Specifies the size of the font in pixels.
-	"FontWeight"             = "font_bold" # Specifies whether the font is bold.
-	"FullScreen"             = "bool"      # Determines whether the console is set to open in full-screen mode.
-	"HistoryBufferSize"      = "int"       # Specifies the number of commands that can be stored in each command history buffer.
-	"HistoryNoDup"           = "bool"      # Specifies whether to remove duplicates in the history buffer.
-	"InsertMode"             = "bool"      # Determines how the system behaves when the user types over existing characters.
-	"LoadConIme"             = "bool"      # Determines whether or not the IME proxy process for the Windows 2000 console (Conime.exe) is loaded automatically when you log on to Windows 2000.
-	"NumberOfHistoryBuffers" = "int"       # Specifies the number of history buffers allocated to store commands.
-	"PopupColors"            = "fg_bg"     # Specifies both foreground and background colors used in popup windows by color name.
-	"QuickEdit"              = "bool"      # Determines whether QuickEdit mode is enabled. In QuickEdit mode, users can cut and paste text by using the mouse.
-	"ScreenBufferSize"       = "dim"       # Determines the size of the screen buffer (the screen that is retained in memory). If the size of the screen displayed on the monitor is smaller than the screen buffer, you can scroll to see the entire screen. You cannot display a console screen that is larger than the screen buffer.
-	"ScreenColors"           = "fg_bg"     # Specifies both foreground and background colors used in the console by color name.
-	"WindowAlpha"            = "int"       # Determines the opacity of the console window (where 0 is transparent and 255 is opaque).
-	"WindowPosition"         = "dim"       # Specifies the position of the command window on the user's screen.
-	"WindowSize"             = "dim"       # Specifies the size of the command window (in columns and rows).
+	"CursorSize" = "cursor" # Specifies the percentage of a character cell that is occupied by the cursor. This setting affects the default window. Values: Small (25%), Medium (50%) or Large (100%).
+	"FaceName" = "string" # Specifies the name of an alternate command window font. If there is no font name in the value of this entry, the system uses raster fonts.
+	"FontFamily" = "font_type" # Specifies whether the font is True Type.
+	"FontSize" = "dim" # Specifies the size of the font in pixels.
+	"FontWeight" = "font_bold" # Specifies whether the font is bold.
+	"FullScreen" = "bool" # Determines whether the console is set to open in full-screen mode.
+	"HistoryBufferSize" = "int" # Specifies the number of commands that can be stored in each command history buffer.
+	"HistoryNoDup" = "bool" # Specifies whether to remove duplicates in the history buffer.
+	"InsertMode" = "bool" # Determines how the system behaves when the user types over existing characters.
+	"LoadConIme" = "bool" # Determines whether or not the IME proxy process for the Windows 2000 console (Conime.exe) is loaded automatically when you log on to Windows 2000.
+	"NumberOfHistoryBuffers" = "int" # Specifies the number of history buffers allocated to store commands.
+	"PopupColors" = "fg_bg" # Specifies both foreground and background colors used in popup windows by color name.
+	"QuickEdit" = "bool" # Determines whether QuickEdit mode is enabled. In QuickEdit mode, users can cut and paste text by using the mouse.
+	"ScreenBufferSize" = "dim" # Determines the size of the screen buffer (the screen that is retained in memory). If the size of the screen displayed on the monitor is smaller than the screen buffer, you can scroll to see the entire screen. You cannot display a console screen that is larger than the screen buffer.
+	"ScreenColors" = "fg_bg" # Specifies both foreground and background colors used in the console by color name.
+	"WindowAlpha" = "int" # Determines the opacity of the console window (where 0 is transparent and 255 is opaque).
+	"WindowPosition" = "dim" # Specifies the position of the command window on the user's screen.
+	"WindowSize" = "dim" # Specifies the size of the command window (in columns and rows).
 }
 # ─── Adds the type for each console color registry property ───────────────────
 $index = 0
@@ -246,7 +246,7 @@ function Add-OhMyPoshColors
 	#>
 	if (Get-Module Oh-My-Posh)
 	{
-		foreach ($token in ($ThemeSettings.Colors.GetEnumerator() | ForEach-Object { $_.Name -replace "(.+)Color", '$1' })) {
+		foreach ($token in ($ThemeSettings.Colors.GetEnumerator() | ForEach-Object { $_.Name -replace "(.+)Color", "$1" })) {
 			$color = Invoke-Expression "`$ThemeSettings.Colors.$($token)Color.ToString()"
 			$Script:ColorMap[$color].Tokens += $token
 		}
@@ -416,6 +416,7 @@ function Enter-Elevated([scriptblock]$Script)
 	# ─── If not currently running as administrator ──────────────────────────────
 	if (-Not ([System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))
 	{
+		Write-Debug "Invoking elevated access script..."
 		Start-Process PowerShell.exe -Verb RunAs -ArgumentList "-NonInteractive -ScriptBlock { $Script }" # Run script as administrator
 	}
 	else
@@ -425,14 +426,14 @@ function Enter-Elevated([scriptblock]$Script)
 }
 function Get-ANSIColor($colorMapValue, $name)
 {
-  if ($colorMapValue.Cmd.Index -eq 0)
-  {
-    "$e[$($colorMapValue.ANSI.FG);47m$($name)$e[0m"
-  }
-  else
-  {
-    "$e[$($colorMapValue.ANSI.FG)m$($name)$e[0m"
-  }
+	if ($colorMapValue.Cmd.Index -eq 0)
+	{
+		"$e[$($colorMapValue.ANSI.FG);47m$($name)$e[0m"
+	}
+	else
+	{
+		"$e[$($colorMapValue.ANSI.FG)m$($name)$e[0m"
+	}
 }
 function Get-ConsoleColorIndex($colorName)
 {
@@ -560,7 +561,8 @@ function Import-ConsoleSettings
 			}
 			# ──────────────────────────────────────── Update console properties ─────
 			$encoded.Keys | ForEach-Object {
-				if (((Get-ItemProperty -Path $consoleRegistryPath).$_) -ne $encoded[$_]) {
+				if (((Get-ItemProperty -Path $consoleRegistryPath).$_) -ne $encoded[$_])
+				{
 					Set-ItemProperty -Path $consoleRegistryPath -Name $_ -Value $encoded[$_]
 					Write-Debug "$consoleRegistryPath\\$_ value modified to $($encoded[$_])"
 				}
@@ -597,18 +599,18 @@ function Set-CommonColors
 		.DESCRIPTION
 		Sets the PowerShell common console colors accordiong to Base16 (https://github.com/chriskempson/base16) color scheme.
 	#>
-	$Host.PrivateData.DebugBackgroundColor    = [ConsoleColor]::Black    # base00 Default backgroud.
-	$Host.PrivateData.DebugForegroundColor    = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
-	$Host.PrivateData.ErrorBackgroundColor    = [ConsoleColor]::Black    # base00 Default backgroud.
-	$Host.PrivateData.ErrorForegroundColor    = [ConsoleColor]::Red      # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
+	$Host.PrivateData.DebugBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+	$Host.PrivateData.DebugForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+	$Host.PrivateData.ErrorBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+	$Host.PrivateData.ErrorForegroundColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
 	$Host.PrivateData.ProgressBackgroundColor = [ConsoleColor]::DarkBlue # base01 Lighter Background (Used for status bars).
-	$Host.PrivateData.ProgressForegroundColor = [ConsoleColor]::White    # base06 Light Foreground (Not often used).
-	$Host.PrivateData.VerboseBackgroundColor  = [ConsoleColor]::Black    # base00 Default backgroud.
-	$Host.PrivateData.VerboseForegroundColor  = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
-	$Host.PrivateData.WarningBackgroundColor  = [ConsoleColor]::Black    # base00 Default backgroud.
-	$Host.PrivateData.WarningForegroundColor  = [ConsoleColor]::Yellow   # base0e Keywords, Storage, Selector, Markup Italic, Diff Changed.
-	$Host.UI.RawUI.BackgroundColor            = [ConsoleColor]::Black    # base00 Default backgroud.
-	$Host.UI.RawUI.ForegroundColor            = [ConsoleColor]::Gray     # base05 Default Foreground, Caret, Delimiters, Operators.
+	$Host.PrivateData.ProgressForegroundColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
+	$Host.PrivateData.VerboseBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+	$Host.PrivateData.VerboseForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+	$Host.PrivateData.WarningBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+	$Host.PrivateData.WarningForegroundColor = [ConsoleColor]::Yellow # base0e Keywords, Storage, Selector, Markup Italic, Diff Changed.
+	$Host.UI.RawUI.BackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+	$Host.UI.RawUI.ForegroundColor = [ConsoleColor]::Gray # base05 Default Foreground, Caret, Delimiters, Operators.
 	Write-Debug "Set common tokens according to $ColorScheme color scheme."
 }
 function Set-ConsoleSettings
@@ -622,19 +624,16 @@ function Set-ConsoleSettings
 		The color scheme to set.
 		.PARAMETER Auto
 		A value indicating whether the light/dark mode is dinamically set. This adds a Dark/Light suffix to the color scheme name.
-		.PARAMETER FontFamily
-		The font family name.
 		.PARAMETER ShowInfo
 		Shows the console information when starts.
 		.PARAMETER Debug
-		A value indicating whether debug messages will be printed.
+		Shows debug messages.
 	#>
 	param
 	(
 		[string]$ColorScheme = "Default",
 		[bool]$Auto = $true,
-		[string]$FontFamily = "Cascadia Code",
-		[bool]$ShowInfo = $true,
+		[switch]$ShowInfo,
 		[switch]$Debug
 	)
 	if ($Debug) { $DebugPreference = 'Continue' } # Write debug if specified.
@@ -649,16 +648,13 @@ function Set-ConsoleSettings
 	$consoleHost = Get-FrontEnd # Get the frontend name.
 	if ($consoleHost -eq "WindowsTerminal")
 	{
-		Set-WindowsTerminal $ColorScheme (!$daytime) $FontFamily # Set Windows Terminal settings.
+		Set-WindowsTerminal $ColorScheme (!$daytime) $Script:FontName # Set Windows Terminal settings.
 	}
 	Set-CommonColors # Set PowerShell console common colors.
 	Set-PSReadLine # Set PSReadLine settings.
 	Set-OhMyPosh # Set Oh-My-Posh settings.
 	Set-GetChildItemColor # Get-ChildItemColor settings.
-	if ($ShowInfo)
-	{
-		Show-ConsoleInfo
-	}
+	if ($ShowInfo) { Show-ConsoleInfo }
 }
 function Set-GetChildItemColor
 {
@@ -673,7 +669,8 @@ function Set-GetChildItemColor
 		Enter-Elevated { Install-Module -AllowClobber Get-ChildItemColor }
 	}
 	Import-Module Get-ChildItemColor
-	$GetChildItemColorTable.File['Directory'] = [ConsoleColor]::DarkGray
+	Write-Debug "Get-ChildItemColor module imported."
+	$GetChildItemColorTable.File["Directory"] = [ConsoleColor]::DarkGray
 	foreach ($type in $GetChildItemColorExtensions.CompressedList)
 	{
 		$GetChildItemColorTable.File[$type] = [ConsoleColor]::Yellow
@@ -698,6 +695,7 @@ function Set-GetChildItemColor
 	{
 		$GetChildItemColorTable.File[$type] = [ConsoleColor]::Cyan
 	}
+	Write-Debug "Get-ChildItemColor module configured."
 }
 function Set-OhMyPosh
 {
@@ -708,12 +706,19 @@ function Set-OhMyPosh
 		Sets the Oh-My-Posh module options.
 	#>
 	# ─── Set Oh-My-Posh prompt ──────────────────────────────────────────────────
-	Use-Module posh-git # Load Posh-Git
-	Use-Module oh-my-posh # Load Oh-My-Posh
-	Import-Module oh-my-posh # Import Oh-My-Posh
-	$ThemeSettings.MyThemesLocation = Resolve-Path (Join-Path $PSScriptRoot "Settings\Oh-My-Posh") # set Oh-My-Posh themes location
-	Set-Theme "Base16" # Set Oh-My-Posh theme.
-	Set-Prompt # Set prompt
+	if (-not (Get-Command oh-my-posh -ErrorAction SilentlyContinue).Path)
+	{
+		if ((Get-Command winget -ErrorAction SilentlyContinue).Path)
+		{
+			winget install oh-my-posh
+			Write-Debug "Oh-My-Posh installed."
+			Copy-Item (Join-Path $PSScriptRoot "settings\Oh-My-Posh")
+			Write-Debug "Oh-My-Posh settings added."
+		}
+	}
+	oh-my-posh --init --shell pwsh --config (Join-Path $env:LOCALAPPDATA "Programs\oh-my-posh\themes\Luigitech.omp.json") | Invoke-Expression # Iinitalize Oh-My-Posh promt
+	Enable-PoshTooltips # Enable Oh-My-Posh tooltips
+	Write-Debug "Oh-My-Posh initialized."
 }
 function Set-PSReadLine
 {
@@ -728,28 +733,30 @@ function Set-PSReadLine
 		Enter-Elevated
 		{
 			Install-Module PSReadLine -AllowPrerelease -Force -SkipPublisherCheck
+			Write-Debug "PSReadLine module installed."
 		}
 		Import-Module PSReadLine
+		Write-Debug "PSReadLine module imported."
 	}
 	$options = Get-PSReadlineOption # Get PSReadLine options
 	# ─────────────────────────────────────────────────── Set Prompt options ─────
-	$options.ContinuationPrompt      = "->"
+	$options.ContinuationPrompt = "->"
 	# ─────────────────────────────────────────────────────────── Set colors ─────
-	$options.CommandColor            = [ConsoleColor]::DarkYellow  # *base0f Deprecated: Opening/Closing Embedded Language Tags (e.g. <?php ?>). Inconsistent
-	$options.CommentColor            = [ConsoleColor]::DarkGray    # base03 Comments, Invisibles, Line Highlighting.
-	$options.ContinuationPromptColor = [ConsoleColor]::DarkGray    # base03 Comments, Invisibles, Line Highlighting.
-	$options.DefaultTokenColor       = [ConsoleColor]::White       # base06 Light Foreground (Not often used).
-	$options.EmphasisColor           = [ConsoleColor]::White       # base06 Light Foreground (Not often used).
-	$options.ErrorColor              = [ConsoleColor]::Red         # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
-	$options.KeywordColor            = [ConsoleColor]::Yellow      # base0e Keywords, Storage, Selector, Markup Italic, Diff Changed.
-	$options.MemberColor             = [ConsoleColor]::DarkMagenta # *base0d Functions, Methods, Attribute IDs, Headings.                        Review
-	$options.NumberColor             = [ConsoleColor]::Cyan        # base09 Integers, Boolean, Constants, XML Attributes, Markup Link Url.
-	$options.OperatorColor           = [ConsoleColor]::Gray        # *base05 Default Foreground, Caret, Delimiters, Operators.                   Base16 standard, review
-	$options.ParameterColor          = [ConsoleColor]::DarkRed     # *base04 Dark Foreground (Used for status bars).                             Review
-	$options.SelectionColor          = [ConsoleColor]::DarkGreen   # base02 Selection Background.
-	$options.StringColor             = [ConsoleColor]::Green       # base0b Strings, Inherited Class, Markup Code, Diff Inserted.
-	$options.TypeColor               = [ConsoleColor]::Magenta     # base0a Classes, Markup Bold, Search Text Background.
-	$options.VariableColor           = [ConsoleColor]::Red         # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
+	$options.CommandColor = [ConsoleColor]::DarkYellow # *base0f Deprecated: Opening/Closing Embedded Language Tags (e.g. <?php ?>). Inconsistent
+	$options.CommentColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+	$options.ContinuationPromptColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+	$options.DefaultTokenColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
+	$options.EmphasisColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
+	$options.ErrorColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
+	$options.KeywordColor = [ConsoleColor]::Yellow # base0e Keywords, Storage, Selector, Markup Italic, Diff Changed.
+	$options.MemberColor = [ConsoleColor]::DarkMagenta # *base0d Functions, Methods, Attribute IDs, Headings. Review
+	$options.NumberColor = [ConsoleColor]::Cyan # base09 Integers, Boolean, Constants, XML Attributes, Markup Link Url.
+	$options.OperatorColor = [ConsoleColor]::Gray # *base05 Default Foreground, Caret, Delimiters, Operators. Base16 standard, review
+	$options.ParameterColor = [ConsoleColor]::DarkRed # *base04 Dark Foreground (Used for status bars). Review
+	$options.SelectionColor = [ConsoleColor]::DarkGreen # base02 Selection Background.
+	$options.StringColor = [ConsoleColor]::Green # base0b Strings, Inherited Class, Markup Code, Diff Inserted.
+	$options.TypeColor = [ConsoleColor]::Magenta # base0a Classes, Markup Bold, Search Text Background.
+	$options.VariableColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
 	Write-Debug "Set PSReadLine tokens according to $ColorScheme color scheme."
 }
 function Set-WindowsTerminal
@@ -763,14 +770,11 @@ function Set-WindowsTerminal
 		The color scheme.
 		.PARAMETER CrtEmulation
 		A value indicating wheter the CRT emulation is turned on.
-		.PARAMETER FontFamily
-		The font family name.
 	#>
 	param
 	(
 		[string]$ColorScheme,
-		[bool]$CrtEmulation,
-		[string]$FontFamily
+		[bool]$CrtEmulation
 	)
 	if ((Get-Process -Id (Get-Process -Id $pid).Parent.Id).Path.Contains("Preview"))
 	{
@@ -801,11 +805,11 @@ function Set-WindowsTerminal
 		}
 		$fontFamilyPropertyName = '"fontFace":'
 		$fontFamilyProperty = $fontFamilyPropertyName + ' "(.*?)"'
-		if ($wtProfile -match $fontFamilyProperty -and $Matches[1] -ne $FontFamily)
+		if ($wtProfile -match $fontFamilyProperty -and $Matches[1] -ne $Script:FontName)
 		{
-			$wtProfile = $wtProfile -replace $fontFamilyProperty, ($fontFamilyPropertyName + ' "' + $FontFamily + '"')
+			$wtProfile = $wtProfile -replace $fontFamilyProperty, ($fontFamilyPropertyName + ' "' + $Script:FontName + '"')
 			$changed = $true
-			Write-Debug "Font changed from $($Matches[1]) to $FontFamily."
+			Write-Debug "Font changed from $($Matches[1]) to $Script:FontName."
 		}
 		if ($changed)
 		{
@@ -827,7 +831,7 @@ function Show-ANSIColors
 		Write-Host ("{0,-7} " -f "  $($bg.Value.ANSI.BG)m") -NoNewline
 	}
 	Write-Host
-	$example = "  " + [char]::ConvertFromUtf32(0x25CF) * 3
+	$example = "  " + [char]::ConvertFromUtf32(0x2022) * 3
 	foreach ($fg in ($Script:ColorMap.GetEnumerator() | Sort-Object { $_.Value.ANSI.FG }))
 	{
 		Write-Host ("{0,7} " -f "$($fg.Value.ANSI.FG)m ", $example) -NoNewline
