@@ -194,253 +194,189 @@ $Script:ColorMap = @{
 		"Tokens" = @()
 	}
 }
-$Script:FontName = "" # Font name
 # ─── Maps console registry setting types ──────────────────────────────────────
 $Script:TypeMap = @{
 	"CursorSize" = "cursor" # Specifies the percentage of a character cell that is occupied by the cursor. This setting affects the default window. Values: Small (25%), Medium (50%) or Large (100%).
-	"FaceName" = "string" # Specifies the name of an alternate command window font. If there is no font name in the value of this entry, the system uses raster fonts.
-	"FontFamily" = "font_type" # Specifies whether the font is True Type.
-	"FontSize" = "dim" # Specifies the size of the font in pixels.
-	"FontWeight" = "font_bold" # Specifies whether the font is bold.
-	"FullScreen" = "bool" # Determines whether the console is set to open in full-screen mode.
-	"HistoryBufferSize" = "int" # Specifies the number of commands that can be stored in each command history buffer.
-	"HistoryNoDup" = "bool" # Specifies whether to remove duplicates in the history buffer.
-	"InsertMode" = "bool" # Determines how the system behaves when the user types over existing characters.
-	"LoadConIme" = "bool" # Determines whether or not the IME proxy process for the Windows 2000 console (Conime.exe) is loaded automatically when you log on to Windows 2000.
-	"NumberOfHistoryBuffers" = "int" # Specifies the number of history buffers allocated to store commands.
-	"PopupColors" = "fg_bg" # Specifies both foreground and background colors used in popup windows by color name.
-	"QuickEdit" = "bool" # Determines whether QuickEdit mode is enabled. In QuickEdit mode, users can cut and paste text by using the mouse.
-	"ScreenBufferSize" = "dim" # Determines the size of the screen buffer (the screen that is retained in memory). If the size of the screen displayed on the monitor is smaller than the screen buffer, you can scroll to see the entire screen. You cannot display a console screen that is larger than the screen buffer.
-	"ScreenColors" = "fg_bg" # Specifies both foreground and background colors used in the console by color name.
-	"WindowAlpha" = "int" # Determines the opacity of the console window (where 0 is transparent and 255 is opaque).
-	"WindowPosition" = "dim" # Specifies the position of the command window on the user's screen.
-	"WindowSize" = "dim" # Specifies the size of the command window (in columns and rows).
+	"FaceName" = "string" # Specifies the name of an alternate command window font. If the font name is empty, the system uses raster fonts.
+	"FontFamily" = "isTrueType" # Indicates whether the font is True Type.
+	"FontSize" = "size" # Specifies the size of the font in pixels.
+	"FontWeight" = "bold" # Specifies whether the font is bold.
+	"FullScreen" = "boolean" # Determines whether the console is set to open in full-screen mode.
+	"HistoryBufferSize" = "integer" # Specifies the number of commands that can be stored in each command history buffer.
+	"HistoryNoDup" = "boolean" # Indicates whether to remove duplicate history entries.
+	"InsertMode" = "boolean" # Determines how the system behaves when the user types over existing characters.
+	"LoadConIme" = "boolean" # Determines whether or not the IME proxy process for the Windows 2000 console (Conime.exe) is loaded automatically when you log on to Windows 2000.
+	"NumberOfHistoryBuffers" = "integer" # Specifies the number of history buffers allocated to store commands.
+	"PopupColors" = "fgBgColors" # Specifies both foreground and background colors used in popup windows by color name.
+	"QuickEdit" = "boolean" # Determines whether QuickEdit mode is enabled. In QuickEdit mode, users can cut and paste text by using the mouse.
+	"ScreenBufferSize" = "size" # Specifies the size of the screen buffer (the screen that is retained in memory). If the size of the screen displayed on the monitor is smaller than the screen buffer, its can be scrolled to see the entire screen.
+	"ScreenColors" = "fgBgColors" # Specifies both foreground and background colors used in the console by color name.
+	"WindowAlpha" = "integer" # Specifies the opacity of the console window (where 0 is transparent and 255 is opaque).
+	"WindowPosition" = "size" # Specifies the position of the command window on the user's screen.
+	"WindowSize" = "size" # Specifies the size of the command window (in columns and rows).
 }
 # ─── Adds the type for each console color registry property ───────────────────
 $index = 0
 [Enum]::GetValues([ConsoleColor]) | ForEach-Object { $Script:TypeMap.Add("ColorTable$(($index++).ToString('00'))", "color") }
-function Add-BasicColors
-{
+function Assert-DayLight([switch]$GeoLocation, [DateTime]$Sunrise = ("8:00" | Get-Date), [DateTime]$Sunset = ("19:00" | Get-Date)) {
 	<#
 		.SYNOPSIS
-		Adds token colors.
+			Affirms if currently theme will be light.
 		.DESCRIPTION
-		Adds PowerShell token colors to color map.
+			Gets a value indicating whether the theme will match light (%true) or dark ($false).
+		.PARAMETER GeoLoction
+			The return value will be set based on the current device time (daylight hours based through the device Geo-Location).
+		.PARAMETER Sunset
+			Indicates the local sunrise time when the `Geolocation` switch is set (in case its cannot be retrieved through the device Geo-Location).
+			Its default value is: 8:00AM
+		.PARAMETER Sunshine
+			Indicates the local sunshine time when the `Geolocation` switch is set (in case its cannot be retrieved through the device Geo-Location).
+			Its default value is: 7:00PM
+		.NOTES
+			By default, this method uses the current Windows theme (for coherence).
 	#>
-	foreach ($token in ($Host.UI.RawUI | Get-Member -MemberType Property -Name *Color | ForEach-Object { $_.Name -replace "(.+)Color", '$1' })) {
-		$color = Invoke-Expression "`$Host.UI.RawUI.$($token)Color.ToString()"
-		$Script:ColorMap[$color].Tokens += $token
-	}
-	foreach ($token in ($Host.PrivateData | Get-Member -MemberType Property -Name *Color | ForEach-Object { $_.Name -replace "(.+)Color", '$1' })) {
-		$color = Invoke-Expression "`$Host.PrivateData.$($token)Color.ToString()"
-		$Script:ColorMap[$color].Tokens += $token
-	}
-}
-function Add-PSReadLineColors
-{
-	<#
-		.SYNOPSIS
-		Adds PSReadLine colors.
-		.DESCRIPTION
-		Adds PSReadLine module token colors to color map.
-	#>
-	if ($PSReadline = Get-Module PSReadLine)
-	{
-		$options = Get-PSReadlineOption
-		if ($PSReadline.Version.Major -ge 2)
-		{
-			foreach ($token in ($options | Get-Member -MemberType Property -Name *Color | ForEach-Object { $_.Name -replace "(.+)Color", '$1' }))
-			{
-				$ansiColor = [regex]::Replace((Invoke-Expression "`$options.$($token)Color.ToString()"), ".*\[((?:\d{1,3};?)+)m", '$1')
-				$color = ($Script:ColorMap.GetEnumerator() | Where-Object { $_.Value.ANSI.FG -in ($ansiColor -split ";") } | Select-Object -First 1).Key
-				$Script:ColorMap[$color].Tokens += $token
-			}
-		}
-		else
-		{
-			foreach ($token in ($options | Get-Member -MemberType Property -Name *ForegroundColor | ForEach-Object { $_.Name -replace "(.+)ForegroundColor", "$1" }))
-			{
-				$color = Invoke-Expression "`$options.$($token)ForegroundColor.ToString()"
-				$Script:ColorMap[$color].Tokens += $token
-			}
+	if (-not $GeoLocation) {
+		# ─── Get current Windows theme ───────────────────────────────────
+		$appsUseLightTheme = Get-ItemPropertyValue "Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" "AppsUseLightTheme"
+		# If light/dark theme is specified...
+		if ($null -ne $appsUseLightTheme) {
+			$daylight = $appsUseLightTheme -eq 1 # Get the daylight based in the current Widows theme.
+			Write-Debug "Daylight: $daylight (based in the current Windows theme)"
+			return $daylight
 		}
 	}
-}
-function Clear-Tokens
-{
-	<#
-		.SYNOPSIS
-		Clears the token color map.
-		.DESCRIPTION
-		Clears the tokens assigned to the colors in the colorMap variable.
-	#>
-	foreach($color in $Script:ColorMap.GetEnumerator())
-	{
-		$color.Value.Tokens = @()
+	# ─── Get Geo-Location ───────────────────────────────────────────────────────────
+	Write-Debug "Retrieving location..."
+	Add-Type -AssemblyName System.Device # Required to access System.Device.Location namespace.
+	$GeoWatcher = New-Object System.Device.Location.GeoCoordinateWatcher #Create the required object.
+	$GeoWatcher.Start() # Begin resolving current locaton.
+	while (($GeoWatcher.Status -ne "Ready") -and ($GeoWatcher.Permission -ne "Denied")) {
+		Start-Sleep -Milliseconds 100 # Wait for discovery location.
 	}
+	if ($GeoWatcher.Permission -eq "Denied") { Write-Error "Access denied for location information" } # Report error.
+	else {
+		$location = $GeoWatcher.Position.Location # Get Geo-Location parameters.
+		$daylight = (Invoke-RestMethod "https://api.sunrise-sunset.org/json?lat=$($location.Latitude)&lng=$($location.Longitude)").Results # Get sunrise and sunset times.
+		$Sunrise = ($daylight.Sunrise | Get-Date).ToLocalTime() # Get today's sunrise time.
+		$Sunset = ($daylight.Sunset | Get-Date).ToLocalTime() # Get today's sunset time.
+		Write-Debug "Current location is $location"
+		Write-Debug "Sunrise time: $Sunrise"
+		Write-Debug "Sunset time: $Sunset"
+	}
+	$datetime = Get-Date # Get current time.
+	Write-Debug "Current time: $datetime"
+	$daylight = $datetime -ge $Sunrise -and $datetime -lt $Sunset
+	Write-Debug "Daytime: $daylight"
+	return $daylight
 }
-function Encode($value, $type)
-{
+function ConvertTo-Registry($Value, [string]$Type) {
 	<#
 		.SYNOPSIS
-		Encodes a value to the specified type.
+		Converts data to Windows registry format.
 		.DESCRIPTION
-		Encodes the specified value to the specified type.
+		Converts the specified `Value` of the specified `Type` to its Windows registry data format.
+		.PARAMETER Value
+		The value to convert.
+		.PARAMETER Type
+		The type of data to convert.
 	#>
-	switch($type)
-	{
-		"bool"
-		{
-			if ($value)
-			{
+	switch ($Type) {
+		"boolean" {
+			if ($Value) {
 				return 1
 			}
-			else
-			{
+			else {
 				return 0
 			}
 		}
-		"color"
-		{
-			if ($value -notmatch "^#[\da-f]{6}$")
-			{
-				Write-Error "Invalid color: $value. Color must be in Hex format. e.g.: #000000."
+		"color" {
+			if ($Value -notmatch "^#[\da-f]{6}$") {
+				Write-Error "Invalid color: $Value. Color must be in Hex format. e.g.: #000000."
 				exit 1
 			}
-			$bytes = [BitConverter]::GetBytes([Convert]::ToInt32($value.Substring(1,6), 16))
-			for ($i = 3; $i -gt 0; $i--)
-			{
+			$bytes = [BitConverter]::GetBytes([Convert]::ToInt32($Value.Substring(1, 6), 16))
+			for ($i = 3; $i -gt 0; $i--) {
 				$bytes[$i] = $bytes[$i - 1]
 			}
 			$bytes[0] = 0
 			[Array]::Reverse($bytes)
 			return [BitConverter]::ToInt32($bytes, 0)
 		}
-		"cursor"
-		{
-			switch($value)
-			{
-				"Small"
-				{
+		"cursor" {
+			switch ($Value) {
+				"Small" {
 					return 0x19
 				}
-				"Medium"
-				{
+				"Medium" {
 					return 0x32
 				}
-				"Large"
-				{
+				"Large" {
 					return 0x64
 				}
-				default
-				{
-					Write-Warning "Invalid cursor_size '$value'. By default, setting to 'Large'."
+				default {
+					Write-Warning "Invalid cursor size '$Value'. By default, setting to 'Large'."
 					return 0x19
 				}
 			}
 		}
-		"dim"
-		{
-			if ($value -notmatch "^\d+x\d+$")
-			{
-				Write-Error "Invalid dimensions: $value."
+		"size" {
+			if ($Value -notmatch "^\d+x\d+$") {
+				Write-Error "Invalid size: $Value."
 				exit 1
 			}
-			$dim = $value.Split("x") | ForEach-Object { [BitConverter]::GetBytes([Int16]::Parse($_)) }
-			return [BitConverter]::ToInt32(@($dim[0], $dim[1], $dim[2], $dim[3]), 0)
+			$size = $Value.Split("x") | ForEach-Object { [BitConverter]::GetBytes([Int16]::Parse($_)) }
+			return [BitConverter]::ToInt32(@($size[0], $size[1], $size[2], $size[3]), 0)
 		}
-		"fg_bg"
-		{
-			$foreground, $background = $value.Split(",")
-			if (!$foreground -or !$background)
-			{
-				Write-Error "Invalid foreground or background color: $value."
+		"fgBgColors" {
+			$foreground, $background = $Value.Split(",")
+			if (!$foreground -or !$background) {
+				Write-Error "Invalid foreground or background color: $Value."
 				exit 1
 			}
-			return (Get-ConsoleColorIndex $background) * 16 + (Get-ConsoleColorIndex $foreground) 
+			return (Get-ConsoleColorIndex $background) * 16 + (Get-ConsoleColorIndex $foreground)
 		}
-		"font_bold"
-		{
-			if ($value)
-			{
+		"bold" {
+			if ($Value) {
 				return 700
 			}
-			else
-			{
+			else {
 				return 400
 			}
 		}
-		"font_type"
-		{
-			if ($value)
-			{
+		"isTrueType" {
+			if ($Value) {
 				return 54
 			}
-			else
-			{
+			else {
 				return 0
 			}
 		}
-		default
-		{
-			return $value
+		default {
+			return $Value
 		}
 	}
 }
-function Enter-Elevated([scriptblock]$Script)
-{
-	<#
-		.SYNOPSIS
-		Executes the specified script with elevated privileges.
-		.DESCRIPTION
-		Enters in administrator session (if needed) and executes the specified script.
-		.PARAMETER script
-		The script block to execute.
-	#>
-	# ─── If not currently running as administrator ──────────────────────────────
-	if (-Not ([System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))
-	{
-		Write-Debug "Invoking elevated access script..."
-		Start-Process PowerShell.exe -Verb RunAs -ArgumentList "-NonInteractive -ScriptBlock { $Script }" # Run script as administrator
-	}
-	else
-	{
-		Invoke-Command -ScriptBlock $Script
-	}
+function Get-ANSIColor($colorMapValue, $name) {
+	if ($colorMapValue.Cmd.Index -eq 0) { "`e[$($colorMapValue.ANSI.FG);47m$($name)`e[0m" }
+	else { "`e[$($colorMapValue.ANSI.FG)m$($name)`e[0m" }
 }
-function Get-ANSIColor($colorMapValue, $name)
-{
-	if ($colorMapValue.Cmd.Index -eq 0)
-	{
-		"$e[$($colorMapValue.ANSI.FG);47m$($name)$e[0m"
-	}
-	else
-	{
-		"$e[$($colorMapValue.ANSI.FG)m$($name)$e[0m"
-	}
-}
-function Get-ConsoleColorIndex($colorName)
-{
+function Get-ConsoleColorIndex($colorName) {
 	<#
 		.SYNOPSIS
 		Gets the console color index.
 		.DESCRIPTION
 		Gets the console color table index for the specified colorName.
 	#>
+	$colorName = $colorName.Trim()
 	$index = 0
-	foreach ($consoleColor in [Enum]::GetValues([ConsoleColor]))
-	{
-		if ($consoleColor -eq $colorName)
-		{
-			return $index
-		}
+	foreach ($consoleColor in [Enum]::GetValues([ConsoleColor])) {
+		if ($consoleColor -eq $colorName) { return $index }
 		$index++
 	}
 	Write-Error "Invalid index color: $colorName."
 	exit 1
 }
-function Get-CurrentProcess
-{
+function Get-CurrentProcess {
 	<#
 		.SYNOPSIS
 		Gets the current process.
@@ -449,8 +385,7 @@ function Get-CurrentProcess
 	#>
 	Get-Process -Id $pid
 }
-function Get-FrontEnd
-{
+function Get-FrontEnd {
 	<#
 		.SYNOPSIS
 		Gets the frontend name.
@@ -458,156 +393,105 @@ function Get-FrontEnd
 		Gets the current process host name.
 	#>
 	$currentProcess = Get-CurrentProcess
-	if ($currentProcess.Parent)
-	{
-		return $currentProcess.Parent.ProcessName
-	}
+	if ($currentProcess.Parent) { return $currentProcess.Parent.ProcessName }
 	return $currentProcess.ProcessName
 }
-function Get-Daytime
-{
+function Install-WingetPackage {
 	<#
 		.SYNOPSIS
-		Indicates whether is daytimes.
+		Checks (and installs if necessary) the specified PackageName.
 		.DESCRIPTION
-		Gets a value indicating whether currently is daytime or nighttime.
+		Checks if the specified PackageName is installed. If not is installed then installs through Windows Package Manager.
+		.PARAMETER PackageName
+		The name of the package to check or install.
 	#>
-	# ────────────────────────────────────────── Set default daylight values ─────
-	$sunrise = ("8:00" | Get-Date) # Set default sunrise time.
-	$sunset = ("19:30" | Get-Date) # Set default sunset time.
-	# ───────────────────────────────────────────────────── Get Geo-Location ─────
-	Write-Debug "Retrieving location..."
-	Add-Type -AssemblyName System.Device # Required to access System.Device.Location namespace.
-	$GeoWatcher = New-Object System.Device.Location.GeoCoordinateWatcher #Create the required object.
-	$GeoWatcher.Start() # Begin resolving current locaton.
-	while (($GeoWatcher.Status -ne "Ready") -and ($GeoWatcher.Permission -ne "Denied"))
-	{
-		Start-Sleep -Milliseconds 100 # Wait for discovery location.
-	}
-	if ($GeoWatcher.Permission -eq "Denied")
-	{
-		Write-Error "Access denied for location information" # Report error
-	}
-	else
-	{
-		# ─────────────────────────────────────────────────────── Get location ─────
-		$location = $GeoWatcher.Position.Location
-		$daytime = (Invoke-RestMethod "https://api.sunrise-sunset.org/json?lat=$($location.Latitude)&lng=$($location.Longitude)").Results # Get sunrise and sunset times
-		# ────────────────────────────────────────────── Convert to local time ─────
-		$sunrise = ($daytime.Sunrise | Get-Date).ToLocalTime()
-		$sunset = ($daytime.Sunset | Get-Date).ToLocalTime()
-		Write-Debug "Current location is $location"
-		Write-Debug "Sunrise time: $sunrise"
-		Write-Debug "Sunset time: $sunset"
-	}
-	$datetime = Get-Date # Get current time
-	Write-Debug "Current time: $datetime"
-	$daytime = $datetime -ge $sunrise -and $datetime -lt $sunset
-	Write-Debug "Daytime: $daytime"
-	return $daytime
-}
-function Import-ConsoleSettings
-{
-	<#
-		.SYNOPSIS
-		Imports the specified console settings.
-		.DESCRIPTION
-		Imports the console settings contained in the specified JSON file path.
-		.PARAMETER files
-		The file paths or file names (under 'Settings' directory, with .json extension) that contains the console settings.
-	#>
-	param
-	(
-		# The file paths or file names (under 'Settings' directory, with .json extension).
-		[Parameter(Mandatory = $true)]
-		[string[]]$files
+	[CmdletBinding()]
+	param ([string]$PackageName
 	)
-	foreach ($file in $files)
-	{
-		Write-Debug "Loading $file settings..."
-		if (!(Test-Path $file))
-		{
-			$file = Resolve-Path "$PSScriptRoot\Settings\$file.json" # Find in local settings directory
-			if (!(Test-Path $file))
-			{
-				Write-Error "File Settings not found: $file" # Show error
-				return
+	if (-not (Get-Command $PackageName -ErrorAction SilentlyContinue)) {
+		if (Get-Command winget -ErrorAction SilentlyContinue) {
+			winget install $PackageName
+			if ($LASTEXITCODE -ne 0) {
+				Write-Debug "$PackageName was not installed."
+				return $false
 			}
-			# ─── Get console settings ───────────────────────────────────────────────
-			$encoded = @{}
-			(Get-Content $file | ConvertFrom-Json).PSObject.Properties | ForEach-Object { $encoded[$_.Name] = (Encode $_.Value $Script:TypeMap[$_.Name]) }
-			# ─── Set console settings ───────────────────────────────────────────────
-			$consoleRegistryPath = "HKCU:\Console"
-			if (!(Test-Path $consoleRegistryPath))
-			{
-				New-Item $consoleRegistryPath | Out-Null # Create console registry key
-				Write-Debug "$consoleRegistryPath key created."
-			}
-			# ──────────────────────────────────────── Update console properties ─────
-			$encoded.Keys | ForEach-Object {
-				if (((Get-ItemProperty -Path $consoleRegistryPath).$_) -ne $encoded[$_])
-				{
-					Set-ItemProperty -Path $consoleRegistryPath -Name $_ -Value $encoded[$_]
-					Write-Debug "$consoleRegistryPath\\$_ value modified to $($encoded[$_])"
-				}
-			}
-			if ($null -ne $encoded['FaceName'])
-			{
-				$Script:FontName = $encoded['FaceName']
-			}
+			Write-Debug "$PackageName installed."
+			return $true
+		}
+		else {
+			Write-Debug "Both $PackageName and winget are not installed."
+			Write-Debug "- Download the latest release of Windows Package Manager located at:"
+			Write-Debug "https://github.com/microsoft/winget-cli/releases/latest"
+			Write-Debug "- Install the package."
+			Write-Debug "- Restart the command promt and try again."
 		}
 	}
+	return $false
 }
-function Set-CmdPrompt
-{
+function Set-CommonColors {
 	<#
 		.SYNOPSIS
-		Sets the CMD prompt.
-		.DESCRIPTION
-		Sets the CMD promt to "Host > Path > ".
-	#>
-	$environmentPath = "HKCU:\Environment"
-	$prompt = "PROMPT"
-	$promptValue = "`$E[0;30;41m " + $env:ComputerName + " `$E[31;42m `$P `$E[0;32m`$E[1;30m "
-	if ((Get-ItemProperty -Path $environmentPath -Name $prompt).PROMPT -ne $promptValue)
-	{
-		Set-ItemProperty -Path "HKCU:\Environment" -Name $prompt -Value $promptValue # Set CMD prompt
-		Write-Debug "CMD Prompt changed."
-	}
-}
-function Set-CommonColors
-{
-	<#
-		.SYNOPSIS
-		Sets the common console colors.
+		Sets the common console colors to Base16 color scheme.
 		.DESCRIPTION
 		Sets the PowerShell common console colors accordiong to Base16 (https://github.com/chriskempson/base16) color scheme.
 	#>
-	$Host.PrivateData.DebugBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-	$Host.PrivateData.DebugForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
-	$Host.PrivateData.ErrorBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-	$Host.PrivateData.ErrorForegroundColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
-	$Host.PrivateData.ProgressBackgroundColor = [ConsoleColor]::DarkBlue # base01 Lighter Background (Used for status bars).
-	$Host.PrivateData.ProgressForegroundColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
-	$Host.PrivateData.VerboseBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-	$Host.PrivateData.VerboseForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
-	$Host.PrivateData.WarningBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-	$Host.PrivateData.WarningForegroundColor = [ConsoleColor]::Yellow # base0e Keywords, Storage, Selector, Markup Italic, Diff Changed.
-	$Host.UI.RawUI.BackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-	$Host.UI.RawUI.ForegroundColor = [ConsoleColor]::Gray # base05 Default Foreground, Caret, Delimiters, Operators.
-	Write-Debug "Set common tokens according to $ColorScheme color scheme."
+	if ($Host.PrivateData.DebugBackgroundColor -ne [ConsoleColor]::Black) {
+		$Host.PrivateData.DebugBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+		Write-DebugColorUpdate $([ConsoleColor]::Black) "Debug background"
+	}
+	if ($Host.PrivateData.DebugForegroundColor -ne [ConsoleColor]::DarkGray) {
+		$Host.PrivateData.DebugForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+		Write-DebugColorUpdate $([ConsoleColor]::DarkGray) "Debug foreground"
+	}
+	if ($Host.PrivateData.ErrorBackgroundColor -ne [ConsoleColor]::Black) {
+		$Host.PrivateData.ErrorBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+		Write-DebugColorUpdate $([ConsoleColor]::Black) "Error background"
+	}
+	if ($Host.PrivateData.ErrorForegroundColor -ne [ConsoleColor]::Red) {
+		$Host.PrivateData.ErrorForegroundColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff deleted.
+		Write-DebugColorUpdate $([ConsoleColor]::Red) "Error foreground"
+	}
+	if ($Host.PrivateData.ProgressBackgroundColor -ne [ConsoleColor]::DarkBlue) {
+		$Host.PrivateData.ProgressBackgroundColor = [ConsoleColor]::DarkBlue # base01 Lighter Background (Used for status bars).
+		Write-DebugColorUpdate $([ConsoleColor]::DarkBlue) "Progress background"
+	}
+	if ($Host.PrivateData.ProgressForegroundColor -ne [ConsoleColor]::White) {
+		$Host.PrivateData.ProgressForegroundColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
+		Write-DebugColorUpdate $([ConsoleColor]::White) "Progress foreground"
+	}
+	if ($Host.PrivateData.VerboseBackgroundColor -ne [ConsoleColor]::Black) {
+		$Host.PrivateData.VerboseBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+		Write-DebugColorUpdate $([ConsoleColor]::Black) "Verbose background"
+	}
+	if ($Host.PrivateData.VerboseForegroundColor -ne [ConsoleColor]::DarkGray) {
+		$Host.PrivateData.VerboseForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+		Write-DebugColorUpdate $([ConsoleColor]::DarkGray) "Verbose foreground"
+	}
+	if ($Host.PrivateData.WarningBackgroundColor -ne [ConsoleColor]::Black) {
+		$Host.PrivateData.WarningBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+		Write-DebugColorUpdate $([ConsoleColor]::Black) "Warning background"
+	}
+	if ($Host.PrivateData.WarningForegroundColor -ne [ConsoleColor]::Yellow) {
+		$Host.PrivateData.WarningForegroundColor = [ConsoleColor]::Yellow # base0e Keywords, Storage, Selector, Markup Italic, Diff changed.
+		Write-DebugColorUpdate $([ConsoleColor]::Yellow) "Warning foreground"
+	}
+	if ($Host.UI.RawUI.BackgroundColor -ne [ConsoleColor]::Black) {
+		$Host.UI.RawUI.BackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+		Write-DebugColorUpdate $([ConsoleColor]::Black) "Background"
+	}
+	if ($Host.UI.RawUI.ForegroundColor -ne [ConsoleColor]::Gray) {
+		$Host.UI.RawUI.ForegroundColor = [ConsoleColor]::Gray # base05 Default Foreground, Caret, Delimiters, Operators.
+		Write-DebugColorUpdate $([ConsoleColor]::Gray) "Foreground"
+	}
 }
-function Set-ConsoleSettings
-{
+function Set-ConsoleSettings {
 	<#
 		.SYNOPSIS
 		Sets the console settings.
 		.DESCRIPTION
 		Sets the default console settings for command prompt (cmd.exe), PowerShell (PowerShell.exe), PowerShell Core (pwsh.exe) and Windows Subsystem for Linux (wsl.exe).
-		.PARAMETER ColorScheme
-		The color scheme to set.
-		.PARAMETER Auto
-		A value indicating whether the light/dark mode is dinamically set. This adds a Dark/Light suffix to the color scheme name.
+		.PARAMETER File
+		The file path (or file name without extension under 'Settings' directory) that contains the console settings.
 		.PARAMETER ShowInfo
 		Shows the console information when starts.
 		.PARAMETER Debug
@@ -615,260 +499,325 @@ function Set-ConsoleSettings
 	#>
 	param
 	(
-		[string]$ColorScheme = "Default",
-		[bool]$Auto = $true,
+		[string]$File = "$PSScriptRoot\Settings\ConsoleSettings.json",
 		[switch]$ShowInfo,
 		[switch]$Debug
 	)
-	if ($Debug) { $DebugPreference = 'Continue' } # Write debug if specified.
-	Set-CmdPrompt # Set CMD prompt.
-	if ($Auto -and $ColorScheme -ne "Default")
-	{
-		# ─── Set light or dark color scheme ───────────────────────────────────────
-		$daytime = Get-Daytime
-		$ColorScheme += @("Dark", "Light")[$daytime]
+	if ($Debug) { $DebugPreference = "Continue" } # Write debug if specified.
+	Install-WingetPackage gsudo | Out-Null
+	# ─── Load settings ──────────────────────────────────────────────────────────────
+	if (!(Test-Path $File)) {
+		Write-Error "File Settings not found: $File" # Show error
+		return
 	}
-	Import-ConsoleSettings "Common", $ColorScheme # Import console settings.
-	$consoleHost = Get-FrontEnd # Get the frontend name.
-	if ($consoleHost -eq "WindowsTerminal")
-	{
-		Set-WindowsTerminal $ColorScheme (!$daytime) $Script:FontName # Set Windows Terminal settings.
+	Write-Debug "Loading '$File' settings..."
+	$settings = @{}
+	(Get-Content $File | ConvertFrom-Json).PSObject.Properties | ForEach-Object { $settings[$_.Name] = (ConvertTo-Registry $_.Value $Script:TypeMap[$_.Name]) }
+	$settings["PROMPT"] = $settings["PROMPT"].Replace("%C", $env:COMPUTERNAME).Replace("%U", $env:USERNAME)
+	# ─── Update console properties ───────────────────────────────────
+	$consoleRegistryPath = "HKCU:\Console"
+	$settings.Keys | ForEach-Object {
+		$consolePropertyValue = ((Get-ItemProperty $consoleRegistryPath).$_)
+		if ($null -ne $consolePropertyValue -and $consolePropertyValue -ne $settings[$_]) {
+			Set-ItemProperty $consoleRegistryPath $_ $settings[$_]
+			Write-Debug "'$consoleRegistryPath\$_' value modified to '$($settings[$_])'"
+		}
 	}
-	Set-CommonColors # Set PowerShell console common colors.
-	Set-PSReadLine # Set PSReadLine settings.
-	Set-OhMyPosh # Set Oh-My-Posh settings.
-	Set-GetChildItemColor # Get-ChildItemColor settings.
+	# ─── Set the CMD prompt ─────────────────────────────────────────────────────────
+	if ((Get-ItemProperty "HKCU:\Environment").PROMPT -ne $settings["PROMPT"]) {
+		Set-ItemProperty "HKCU:\Environment" "PROMPT" $settings["PROMPT"]
+		Write-Debug "CMD Prompt changed to '$($settings["PROMPT"])'."
+	}
+	# ─── Set color scheme ───────────────────────────────────────────────────────────
+	if ($null -ne $settings["ColorScheme"]) {
+		$colorScheme = $settings["ColorScheme"]
+		# ─── Sets auto light mode ────────────────────────────────────────
+		if ($null -ne $settings["AutoLightMode"]) {
+			if ($settings["AutoLightMode"]) {
+				$settings["DayLight"] = Assert-DayLight
+				$settings["ColorScheme"] += @("Dark", "Light")[$settings["DayLight"]]
+			}
+		}
+	}
+	Set-CommonColors
+	Set-PSReadLine $settings["ContinuationPrompt"]
+	if (Get-FrontEnd -eq "WindowsTerminal") { Set-WindowsTerminal $colorScheme (-not $dayLight) $settings["FaceName"] } # Set Windows Terminal settings.
+	if ($null -ne $settings["OhMyPoshConfig"]) { Set-OhMyPosh $settings["OhMyPoshConfig"] } # Set Oh-My-Posh settings.
+	Use-Module Terminal-Icons # Load Terminal-Icons module.
 	if ($ShowInfo) { Show-ConsoleInfo }
 }
-function Set-GetChildItemColor
-{
-	<#
-		.SYNOPSIS
-		Sets Get-ChildItemColor options.
-		.DESCRIPTION
-		Sets the Get-ChildItemColor module options.
-	#>
-	if (-Not (Get-Module -ListAvailable -Name Get-ChildItemColor))
-	{
-		Enter-Elevated { Install-Module -AllowClobber Get-ChildItemColor }
-	}
-	Import-Module Get-ChildItemColor
-	Write-Debug "Get-ChildItemColor module imported."
-	$GetChildItemColorTable.File["Directory"] = [ConsoleColor]::DarkGray
-	foreach ($type in $GetChildItemColorExtensions.CompressedList)
-	{
-		$GetChildItemColorTable.File[$type] = [ConsoleColor]::Yellow
-	}
-	foreach ($type in $GetChildItemColorExtensions.ConfigsList)
-	{
-		$GetChildItemColorTable.File[$type] = [ConsoleColor]::Green
-	}
-	foreach ($type in $GetChildItemColorExtensions.DllPdbList)
-	{
-		$GetChildItemColorTable.File[$type] = [ConsoleColor]::Magenta
-	}
-	foreach ($type in $GetChildItemColorExtensions.ExecutableList)
-	{
-		$GetChildItemColorTable.File[$type] = [ConsoleColor]::DarkYellow
-	}
-	foreach ($type in $GetChildItemColorExtensions.SourceCodeList)
-	{
-		$GetChildItemColorTable.File[$type] = [ConsoleColor]::Blue
-	}
-	foreach ($type in $GetChildItemColorExtensions.TextList)
-	{
-		$GetChildItemColorTable.File[$type] = [ConsoleColor]::Cyan
-	}
-	Write-Debug "Get-ChildItemColor module configured."
-}
-function Set-OhMyPosh
-{
+function Set-OhMyPosh {
 	<#
 		.SYNOPSIS
 		Sets Oh-My-Posh options.
 		.DESCRIPTION
 		Sets the Oh-My-Posh module options.
 	#>
+	param
+	(
+		[string]$Theme
+	)
+	$ohMyPoshThemesFolder = Join-Path $env:LOCALAPPDATA "Programs\oh-my-posh\themes"
 	# ─── Set Oh-My-Posh prompt ──────────────────────────────────────────────────
-	if (-not (Get-Command oh-my-posh -ErrorAction SilentlyContinue).Path)
-	{
-		if ((Get-Command winget -ErrorAction SilentlyContinue).Path)
-		{
-			winget install oh-my-posh
-			Write-Debug "Oh-My-Posh installed."
-			Copy-Item (Join-Path $PSScriptRoot "settings\Oh-My-Posh")
-			Write-Debug "Oh-My-Posh settings added."
-		}
+	if (Install-WingetPackage oh-my-posh) {
+		Copy-Item (Join-Path $PSScriptRoot "settings\Oh-My-Posh\*.omp.json") $ohMyPoshThemesFolder
+		Write-Debug "Oh-My-Posh settings added."
 	}
-	oh-my-posh --init --shell pwsh --config (Join-Path $env:LOCALAPPDATA "Programs\oh-my-posh\themes\Luigitech.omp.json") | Invoke-Expression # Iinitalize Oh-My-Posh promt
+	if (-not (Test-Path $Theme)) {
+		$Theme = Join-Path $ohMyPoshThemesFolder "$Theme.omp.json"
+	}
+	if (-not (Test-Path $Theme)) {
+		Write-Warning "The specified configuration file located at '$Theme' cannot be found."
+		oh-my-posh --init --shell pwsh | Invoke-Expression # Iinitalize Oh-My-Posh promt
+		Write-Debug "Oh-My-Posh initialized."
+		return
+	}
+	Write-Debug "Oh My Posh theme set to $Theme"
+	oh-my-posh --init --shell pwsh --config $Theme | Invoke-Expression # Iinitalize Oh-My-Posh promt
 	Enable-PoshTooltips # Enable Oh-My-Posh tooltips
 	Write-Debug "Oh-My-Posh initialized."
 }
-function Set-PSReadLine
-{
+function Set-PSReadLine([string]$ContinuationPrompt) {
 	<#
 		.SYNOPSIS
 		Sets PSReadLine options.
 		.DESCRIPTION
-		Sets the PSReadLine module options.
+		Sets the `PSReadLine` module options.
 	#>
-	if (-Not (Get-Module -ListAvailable -Name PSReadLine) -or (Get-Module -ListAvailable -Name PSReadLine).Version.Major -lt 2)
-	{
-		Enter-Elevated
-		{
-			Install-Module PSReadLine -AllowPrerelease -Force -SkipPublisherCheck
-			Write-Debug "PSReadLine module installed."
-		}
+	if (-Not (Get-Module -ListAvailable -Name PSReadLine) -or (Get-Module -ListAvailable -Name PSReadLine).Version.Major -lt 2) {
+		sudo Install-Module PSReadLine -AllowPrerelease -Force -SkipPublisherCheck
+		Write-Debug "'PSReadLine' module installed."
 		Import-Module PSReadLine
-		Write-Debug "PSReadLine module imported."
+		Write-Debug "'PSReadLine' module imported."
 	}
 	$options = Get-PSReadlineOption # Get PSReadLine options
-	# ─────────────────────────────────────────────────── Set Prompt options ─────
-	$options.ContinuationPrompt = "->"
-	# ─────────────────────────────────────────────────────────── Set colors ─────
-	$options.CommandColor = [ConsoleColor]::DarkYellow # *base0f Deprecated: Opening/Closing Embedded Language Tags (e.g. <?php ?>). Inconsistent
-	$options.CommentColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
-	$options.ContinuationPromptColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
-	$options.DefaultTokenColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
-	$options.EmphasisColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
-	$options.ErrorColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
-	$options.KeywordColor = [ConsoleColor]::Yellow # base0e Keywords, Storage, Selector, Markup Italic, Diff Changed.
-	$options.MemberColor = [ConsoleColor]::DarkMagenta # *base0d Functions, Methods, Attribute IDs, Headings. Review
-	$options.NumberColor = [ConsoleColor]::Cyan # base09 Integers, Boolean, Constants, XML Attributes, Markup Link Url.
-	$options.OperatorColor = [ConsoleColor]::Gray # *base05 Default Foreground, Caret, Delimiters, Operators. Base16 standard, review
-	$options.ParameterColor = [ConsoleColor]::DarkRed # *base04 Dark Foreground (Used for status bars). Review
-	$options.SelectionColor = [ConsoleColor]::DarkGreen # base02 Selection Background.
-	$options.StringColor = [ConsoleColor]::Green # base0b Strings, Inherited Class, Markup Code, Diff Inserted.
-	$options.TypeColor = [ConsoleColor]::Magenta # base0a Classes, Markup Bold, Search Text Background.
-	$options.VariableColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
-	Write-Debug "Set PSReadLine tokens according to $ColorScheme color scheme."
+	if ($ContinuationPrompt -and $options.ContinuationPrompt -ne $ContinuationPrompt) {
+		$options.ContinuationPrompt = $ContinuationPrompt # Set continuation prompt
+		Write-Debug "Continuation prompt set to '$ContinuationPrompt'."
+	}
+	# ─── Set colors ─────────────────────────────────────────────────────────────────
+	if ($options.CommandColor -ne [ConsoleColor]::DarkYellow) {
+		$options.CommandColor = [ConsoleColor]::DarkYellow # base0f Deprecated: Opening/Closing Embedded Language Tags (e.g. <?php ?>).
+		Write-Debug "Command color set to $($options.CommandColor)$([ConsoleColor]::DarkYellow)"
+	}
+	if ($options.CommentColor -ne [ConsoleColor]::DarkGray) {
+		$options.CommentColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+		Write-Debug "Comment color set to $($options.CommentColor)$([ConsoleColor]::DarkGray)"
+	}
+	if ($options.ContinuationPromptColor -ne [ConsoleColor]::DarkGray) {
+		$options.ContinuationPromptColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+		Write-Debug "Continuation promt color set to $($options.ContinuationPromptColor)$([ConsoleColor]::DarkGray)"
+	}
+	if ($options.DefaultTokenColor -ne [ConsoleColor]::White) {
+		$options.DefaultTokenColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
+		Write-Debug "Default token color set to $($options.DefaultTokenColor)$([ConsoleColor]::White)"
+	}
+	if ($options.EmphasisColor -ne [ConsoleColor]::White) {
+		$options.EmphasisColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
+		Write-Debug "Emphasis color set to $($options.EmphasisColor)$([ConsoleColor]::White)"
+	}
+	if ($options.ErrorColor -ne [ConsoleColor]::Red) {
+		$options.ErrorColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
+		Write-Debug "Error color set to $($options.ErrorColor)$([ConsoleColor]::Red)"
+	}
+	if ($options.KeywordColor -ne [ConsoleColor]::Yellow) {
+		$options.KeywordColor = [ConsoleColor]::Yellow # base0e Keywords, Storage, Selector, Markup Italic, Diff Changed.
+		Write-Debug "Keyword color set to $($options.KeywordColor)$([ConsoleColor]::Yellow)"
+	}
+	if ($options.MemberColor -ne [ConsoleColor]::DarkMagenta) {
+		$options.MemberColor = [ConsoleColor]::DarkMagenta # *base0d Functions, Methods, Attribute IDs, Headings. Review
+		Write-Debug "Member color set to $($options.MemberColor)$([ConsoleColor]::DarkMagenta)"
+	}
+	if ($options.NumberColor -ne [ConsoleColor]::Cyan) {
+		$options.NumberColor = [ConsoleColor]::Cyan # base09 Integers, Boolean, Constants, XML Attributes, Markup Link Url.
+		Write-Debug "Number color set to $($options.NumberColor)$([ConsoleColor]::Cyan)"
+	}
+	if ($options.OperatorColor -ne [ConsoleColor]::Gray) {
+		$options.OperatorColor = [ConsoleColor]::Gray # *base05 Default Foreground, Caret, Delimiters, Operators. Base16 standard, review
+		Write-Debug "Operator color set to $($options.OperatorColor)$([ConsoleColor]::Gray)"
+	}
+	if ($options.ParameterColor -ne [ConsoleColor]::DarkRed) {
+		$options.ParameterColor = [ConsoleColor]::DarkRed # *base04 Dark Foreground (Used for status bars). Review
+		Write-Debug "Parameter color set to $($options.ParameterColor)$([ConsoleColor]::DarkRed)"
+	}
+	if ($options.SelectionColor -ne [ConsoleColor]::DarkGreen) {
+		$options.SelectionColor = [ConsoleColor]::DarkGreen # base02 Selection Background.
+		Write-Debug "Selection color set to $($options.SelectionColor)$([ConsoleColor]::DarkGreen)"
+	}
+	if ($options.StringColor -ne [ConsoleColor]::Green) {
+		$options.StringColor = [ConsoleColor]::Green # base0b Strings, Inherited Class, Markup Code, Diff Inserted.
+		Write-Debug "String color set to $($options.StringColor)$([ConsoleColor]::Green)"
+	}
+	if ($options.TypeColor -ne [ConsoleColor]::Magenta) {
+		$options.TypeColor = [ConsoleColor]::Magenta # base0a Classes, Markup Bold, Search Text Background.
+		Write-Debug "Type color set to $($options.TypeColor)$([ConsoleColor]::Magenta)"
+	}
+	if ($options.VariableColor -ne [ConsoleColor]::Red) {
+		$options.VariableColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
+		Write-Debug "Variable color set to $($options.VariableColor)$([ConsoleColor]::Red)"
+	}
 }
-function Set-WindowsTerminal
-{
+function Set-WindowsTerminal {
 	<#
 		.SYNOPSIS
 		Sets the Windows Terminal settings.
 		.DESCRIPTION
-		Sets the color scheme, CRT-Emulation and font for Windows Terminal.
+		Sets the color scheme, CRT-Emulation and font family for Windows Terminal.
 		.PARAMETER ColorScheme
 		The color scheme.
 		.PARAMETER CrtEmulation
 		A value indicating wheter the CRT emulation is turned on.
+		.PARAMETER FontFamily
+		The font family.
 	#>
 	param
 	(
 		[string]$ColorScheme,
-		[bool]$CrtEmulation
+		[bool]$CrtEmulation,
+		[string]$FontFamily
 	)
-	if ((Get-Process -Id (Get-Process -Id $pid).Parent.Id).Path.Contains("Preview"))
-	{
-		$wtProfileLocation = "Preview"
+	# ─── Get profile location ───────────────────────────────────────────────────────
+	$wtProfileLocation = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal"
+	$process = Get-Process -Id $pid
+	if ($null -ne $process.Parent) { $process = $process.Parent }
+	if ($process.Path.Contains("Preview")) { $wtProfileLocation += "Preview" }
+	$wtProfileLocation += "_8wekyb3d8bbwe\LocalState\settings.json"
+	if (-not (Test-Path $wtProfileLocation)) { return } # If settings file don't exists, skip.
+	Write-Debug "Opening Windows Terminal settings on '$wtProfileLocation'"
+	$wtProfile = Get-Content -Path $wtProfileLocation -Raw # Get profile
+	$changed = $false
+	$colorSchemePropertyName = '"colorScheme":'
+	$colorSchemeProperty = $colorSchemePropertyName + ' "(.*?)"'
+	if ($wtProfile -match $colorSchemeProperty -and $Matches[1] -ne $ColorScheme) {
+		$wtProfile = $wtProfile -replace $colorSchemeProperty, ($colorSchemePropertyName + ' "' + $ColorScheme + '"')
+		$changed = $true
+		Write-Debug "Color scheme changed from '$($Matches[1])' to '$ColorScheme'."
 	}
-	$wtProfileLocation = "Microsoft.WindowsTerminal" + $wtProfileLocation + "_8wekyb3d8bbwe"
-	$wtProfileLocation = Join-Path $env:LOCALAPPDATA "Packages" $wtProfileLocation "LocalState" "settings.json" # Get profile location.
-	if (Test-Path $wtProfileLocation)
-	{
-		Write-Debug "Opening Windows Terminal settings at $wtProfileLocation"
-		$wtProfile = Get-Content -Path $wtProfileLocation -Raw # Get profile
-		$changed = $false
-		$colorSchemePropertyName = '"colorScheme":'
-		$colorSchemeProperty = $colorSchemePropertyName + ' "(.*?)"'
-		if ($wtProfile -match $colorSchemeProperty -and $Matches[1] -ne $ColorScheme)
-		{
-			$wtProfile = $wtProfile -replace $colorSchemeProperty, ($colorSchemePropertyName + ' "' + $ColorScheme + '"')
-			$changed = $true
-			Write-Debug "Color scheme changed from $($Matches[1]) to $ColorScheme."
-		}
-		$crtEmulationProperty = '"experimental.retroTerminalEffect": '
-		$wrongCrtEmulation = $crtEmulationProperty + $Script:BoolValues[-Not $CrtEmulation]
-		if ($wtProfile -match $wrongCrtEmulation)
-		{
-			$wtProfile = $wtProfile -replace $wrongCrtEmulation, ($crtEmulationProperty + $Script:BoolValues[$CrtEmulation])
-			$changed = $true
-			Write-Debug "CRT emulation set to $crtEmulation."
-		}
-		$fontFamilyPropertyName = '"fontFace":'
-		$fontFamilyProperty = $fontFamilyPropertyName + ' "(.*?)"'
-		if ($wtProfile -match $fontFamilyProperty -and $Matches[1] -ne $Script:FontName)
-		{
-			$wtProfile = $wtProfile -replace $fontFamilyProperty, ($fontFamilyPropertyName + ' "' + $Script:FontName + '"')
-			$changed = $true
-			Write-Debug "Font changed from $($Matches[1]) to $Script:FontName."
-		}
-		if ($changed)
-		{
-			Set-Content -Path $wtProfileLocation -Value $wtProfile
-		}
+	$crtEmulationProperty = '"experimental.retroTerminalEffect": '
+	$wrongCrtEmulation = $crtEmulationProperty + $Script:BoolValues[-Not $CrtEmulation]
+	if ($wtProfile -match $wrongCrtEmulation) {
+		$wtProfile = $wtProfile -replace $wrongCrtEmulation, ($crtEmulationProperty + $Script:BoolValues[$CrtEmulation])
+		$changed = $true
+		Write-Debug "CRT emulation set to '$crtEmulation'."
+	}
+	$fontFamilyPropertyName = '"fontFace":'
+	$fontFamilyProperty = $fontFamilyPropertyName + ' "(.*?)"'
+	if ($wtProfile -match $fontFamilyProperty -and $Matches[1] -ne $FontFamily) {
+		$wtProfile = $wtProfile -replace $fontFamilyProperty, ($fontFamilyPropertyName + ' "' + $FontFamily + '"')
+		$changed = $true
+		Write-Debug "Font changed from '$($Matches[1])' to '$FontFamily'."
+	}
+	if ($changed) {
+		Set-Content -Path $wtProfileLocation -Value $wtProfile
+		Write-Debug "Windows Terminal settings saved to '$wtProfileLocation'."
 	}
 }
-function Show-ANSIColors
-{
+function Show-ANSIColors([switch]$Full) {
 	<#
 		.SYNOPSIS
 		Shows the ANSI colors.
 		.DESCRIPTION
-		Shows the current ANSI colors.
+		Shows the current 16 ANSI colors.
+		.PARAMETER Full
+		Shows the 256 ANSI foreground and backgrond colors.
 	#>
+	Write-Host
+	if ($Full) {
+		# ─── Shows the 256 ANSI foreground and backgrond colors ──────────
+		foreach ($fgbg in 38, 48) {
+			foreach ($color in 0..255) {
+				Write-Host -NoNewLine "`e[$fgbg;5;${color}m$($color.ToString().PadLeft(8))`e[0m"
+				if (($color + 1) % 6 -eq 4) { Write-Host } # Display 6 colors per line
+			}
+		}
+		Write-Host
+		return
+	}
+	# ─── Shows the current 16 ANSI colors ───────────────────────────────────────────
 	Write-Host (" " * 16) -NoNewline
-	foreach ($bg in ($Script:ColorMap.GetEnumerator() | Where-Object { [System.Convert]::ToInt32($_.Value.ANSI.BG) -le 47 } | Sort-Object { $_.Value.ANSI.BG }))
-	{
+	foreach ($bg in ($Script:ColorMap.GetEnumerator() | Where-Object { [System.Convert]::ToInt32($_.Value.ANSI.BG) -le 47 } | Sort-Object { $_.Value.ANSI.BG })) {
 		Write-Host ("{0,-7} " -f "  $($bg.Value.ANSI.BG)m") -NoNewline
 	}
 	Write-Host
 	$example = "  " + [char]::ConvertFromUtf32(0x2022) * 3
-	foreach ($fg in ($Script:ColorMap.GetEnumerator() | Sort-Object { $_.Value.ANSI.FG }))
-	{
-		Write-Host ("{0,7} " -f "$($fg.Value.ANSI.FG)m ", $example) -NoNewline
-		Write-Host ("{0,-7} " -f $example) -ForegroundColor $fg.Name -NoNewline
-		foreach ($bg in ($Script:ColorMap.GetEnumerator() | Where-Object { [System.Convert]::ToInt32($_.Value.ANSI.BG) -le 47 } | Sort-Object { $_.Value.ANSI.BG }))
-		{
+	foreach ($fg in ($Script:ColorMap.GetEnumerator() | Sort-Object { $_.Value.ANSI.FG })) {
+		Write-Host ("{0,-7}" -f "  $($fg.Value.ANSI.FG)m") -NoNewline
+		Write-Host " " -NoNewline
+		Write-Host ("{0,-7}" -f $example) -ForegroundColor $fg.Name -NoNewline
+		Write-Host " " -NoNewline
+		foreach ($bg in ($Script:ColorMap.GetEnumerator() | Where-Object { [System.Convert]::ToInt32($_.Value.ANSI.BG) -le 47 } | Sort-Object { $_.Value.ANSI.BG })) {
 			Write-Host ("{0,-7}" -f $example) -BackgroundColor $bg.Name -ForegroundColor $fg.Name -NoNewline
 			Write-Host " " -NoNewline
 		}
 		Write-Host
 	}
-	Write-Host "`n"
+	Write-Host
 }
-function Show-ConsoleColors([switch]$Basic, [switch]$PsReadLine)
-{
+function Show-ConsoleColors([switch]$Basic, [switch]$PsReadLine) {
 	<#
 		.SYNOPSIS
 		Shows the current console colors.
 		.DESCRIPTION
 		Shows the current console colors and, optionally, the colors specified to the different tokens.
-		.PARAMETER basic
+		.PARAMETER Basic
 		A value indicating whether to show the colors of the basic tokens.
 		.PARAMETER PsReadLine
 		A value indicating whether to show the colors of the PSReadline tokens.
 	#>
-	Clear-Tokens
+	foreach ($color in $Script:ColorMap.GetEnumerator()) { $color.Value.Tokens = @() } # Clears the tokens assigned to the colors in the colorMap variable.
 	$all = -not $Basic -and -not $PsReadLine
-	if ($all -or $Basic) { Add-BasicColors }
-	if ($all -or $PsReadLine) { Add-PSReadLineColors }
-	$e = [char]27
-	$Script:ColorMap.GetEnumerator() | Sort-Object { $_.Value.Cmd.Index } | Format-Table @{
-			Label = "##"
-			Expression = { ("$e[0m{0:00}" -f $_.Value.Cmd.Index) }
-		},
-		@{
-			Label = "PowerShell"
-			Expression = { Get-ANSIColor $_.Value $_.Name }
-		},
-		@{
-			Label = "CMD"
-			Expression = { Get-ANSIColor $_.Value $_.Value.Cmd.Name }
-		},
-		@{
-			Label = "ANSI"
-			Expression = { Get-ANSIColor $_.Value $_.Value.ANSI.FG }
-		},
-		@{
-			Label = "Tokens"
-			Expression = { Get-ANSIColor $_.Value $_.Value.Tokens }
+	if ($all -or $Basic) {
+		# ─── Add basic colors ────────────────────────────────────────────
+		foreach ($token in ($Host.UI.RawUI | Get-Member *Color -MemberType Property | ForEach-Object { $_.Name -replace "(.+)Color", '$1' })) {
+			$color = Invoke-Expression "`$Host.UI.RawUI.$($token)Color.ToString()"
+			$Script:ColorMap[$color].Tokens += $token
 		}
+		foreach ($token in ($Host.PrivateData | Get-Member *Color -MemberType Property | ForEach-Object { $_.Name -replace "(.+)Color", '$1' })) {
+			$color = Invoke-Expression "`$Host.PrivateData.$($token)Color.ToString()"
+			$Script:ColorMap[$color].Tokens += $token
+		}
+	}
+	if ($all -or $PsReadLine) {
+		$PSReadLineModule = Get-Module PSReadLine
+		if ($null -ne $PSReadLineModule) {
+			$options = Get-PSReadlineOption
+			if ($PSReadLineModule.Version.Major -ge 2) {
+				foreach ($token in ($options | Get-Member *Color -MemberType Property | ForEach-Object { $_.Name -replace "(.+)Color", '$1' })) {
+					$ansiColor = [regex]::Replace((Invoke-Expression "`$options.$($token)Color.ToString()"), ".*\[((?:\d{1,3};?)+)m", '$1')
+					$color = ($Script:ColorMap.GetEnumerator() | Where-Object { $_.Value.ANSI.FG -in ($ansiColor -split ";") } | Select-Object -First 1).Key
+					$Script:ColorMap[$color].Tokens += $token
+				}
+			}
+			else {
+				foreach ($token in ($options | Get-Member *ForegroundColor -MemberType Property | ForEach-Object { $_.Name -replace "(.+)ForegroundColor", "$1" })) {
+					$color = Invoke-Expression "`$options.$($token)ForegroundColor.ToString()"
+					$Script:ColorMap[$color].Tokens += $token
+				}
+			}
+		}
+	}
+	$Script:ColorMap.GetEnumerator() | Sort-Object { $_.Value.Cmd.Index } | Format-Table @{
+		Label      = "##"
+		Expression = { ("`e[0m{0:00}" -f $_.Value.Cmd.Index) }
+	},
+	@{
+		Label      = "PowerShell"
+		Expression = { Get-ANSIColor $_.Value $_.Name }
+	},
+	@{
+		Label      = "CMD"
+		Expression = { Get-ANSIColor $_.Value $_.Value.Cmd.Name }
+	},
+	@{
+		Label      = "ANSI"
+		Expression = { Get-ANSIColor $_.Value $_.Value.ANSI.FG }
+	},
+	@{
+		Label      = "Tokens"
+		Expression = { Get-ANSIColor $_.Value $_.Value.Tokens }
+	}
 }
-function Show-ConsoleInfo
-{
+function Show-ConsoleInfo {
 	<#
 		.SYNOPSIS
 		Shows the current console information.
@@ -887,12 +836,10 @@ function Show-ConsoleInfo
 	Write-Host ([System.Environment]::MachineName)
 	Write-Host "    |BBBBBBBBBBBBBBHw    ""HBBBBBBBBBBBB    " -ForegroundColor Blue -NoNewline
 	Write-Host "$(Get-ItemPropertyValue $regKey ProductName) " -ForegroundColor DarkYellow -NoNewline
-	if ([System.Environment]::Is64BitOperatingSystem)
-	{
+	if ([System.Environment]::Is64BitOperatingSystem) {
 		$architecture = "64"
 	}
-	else
-	{
+	else {
 		$architecture = "86"
 	}
 	Write-Host "$(Get-ItemPropertyValue $regKey DisplayVersion) (x$architecture)"
@@ -912,24 +859,22 @@ function Show-ConsoleInfo
 	Write-Host " ``ººººººººººººººººººººººººººººººººº" -ForegroundColor Blue
 	Write-Host
 }
-function Use-Module([string]$Module)
-{
+function Use-Module([string]$ModuleName) {
 	<#
 		.SYNOPSIS
 		Loads the specified module.
 		.DESCRIPTION
 		Istalls (if not installed) and imports the specified module.
-		.PARAMETER Module
+		.PARAMETER ModuleName
 		The module name to load.
 	#>
-	# ─── Install module ─────────────────────────────────────────────────────────────
-	if (-Not (Get-Module -ListAvailable -Name $Module))
-	{
-		Enter-Elevated
-		{
-			Install-Module $Module
-		}
-	}
-	# ─── Import module ──────────────────────────────────────────────────────────────
-	Import-Module $Module
+	if (-Not (Get-Module -ListAvailable -Name $ModuleName)) {
+		sudo Install-Module $ModuleName
+		Write-Debug "Module $ModuleName installed."
+	} # Install module
+	Import-Module $ModuleName # Import module
+	Write-Debug "Module $ModuleName imported."
+}
+function Write-DebugColorUpdate($colorName, [string]$description) {
+	Write-Debug "$description color set to $(Get-ANSIColor $ColorMap["$colorName"] $colorName)."
 }

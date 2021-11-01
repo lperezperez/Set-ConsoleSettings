@@ -5,7 +5,7 @@
   Author = "Luis Pérez"
   Copyright = "2021 © Luis Pérez"
   Description = "Sets default console settings."
-  FunctionsToExport = @("Enter-Elevated", "Get-ConsoleHost", "Set-ConsoleSettings", "Show-ANSIColors", "Show-ConsoleColors", "Show-ConsoleInfo")
+  FunctionsToExport = @("Assert-DayLight", "Enter-Elevated", "Get-ConsoleHost", "Get-FrontEnd", "Get-DarkMode", "Set-ConsoleSettings", "Show-ANSIColors", "Show-ConsoleColors", "Show-ConsoleInfo")
   # Private data to pass to the module specified in RootModule. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
   PrivateData = @{
     PSData = @{
