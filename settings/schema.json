@@ -1,0 +1,152 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://example.com/ConsoleSettings",
+	"title": "Set-ConsoleSettings definition scheme",
+	"description": "Settings used for the Set-ConsoleSettings cmdlet (https://github.com/lperezperez/Set-ConsoleSettings).",
+	"type": "object",
+	"properties": {
+		"AutoLightMode": {
+			"type": "boolean",
+			"title": "Auto light mode",
+			"description": "Indicates whether the color scheme should be adapted to day/night light conditions.",
+			"required": [
+				"ColorScheme"
+			],
+			"default": false
+		},
+		"ColorScheme": {
+			"type": "string",
+			"title": "Color scheme",
+			"description": "Specifies the absolute path or the name of the color schema to use."
+		},
+		"ContinuationPrompt": {
+			"type": "string",
+			"title": "Continuation prompt",
+			"description": "Specifies the string displayed at the beginning of the subsequent lines when multi-line input is entered.",
+			"default": ">>"
+		},
+		"CursorSize": {
+			"type": "string",
+			"title": "Cursor size",
+			"description": "Specifies the percentage of a character cell that is occupied by the cursor. This setting affects the default window.",
+			"enum": [
+				"Small",
+				"Medium",
+				"Large"
+			],
+			"default": "Small"
+		},
+		"FaceName": {
+			"type": "string",
+			"title": "Font name",
+			"description": "Specifies the name of an alternate command window font. If the font name in empty, the system uses raster fonts."
+		},
+		"FontFamily": {
+			"type": "boolean",
+			"title": "True Type font",
+			"description": "Indicates whether the font is True Type."
+		},
+		"FontSize": {
+			"type": "string",
+			"title": "Font size",
+			"description": "Specifies the size ([Width]x[Height]) of the command window font.",
+			"pattern": "^[0-9]+x[0-9]+$",
+			"default": "0x0"
+		},
+		"FontWeight": {
+			"type": "boolean",
+			"title": "Font bold",
+			"description": "Indicates whether the font is bold.",
+			"default": false
+		},
+		"FullScreen": {
+			"type": "boolean",
+			"title": "Full screen",
+			"description": "Indicates whether the command window is set to open in full-screen mode.",
+			"default": false
+		},
+		"HistoryBufferSize": {
+			"type": "integer",
+			"title": "Maximum history commands",
+			"description": "Specifies the number of commands that can be stored in each command history buffer.",
+			"minimum": 1,
+			"maximum": 999,
+			"default": 50
+		},
+		"HistoryNoDup": {
+			"type": "boolean",
+			"title": "Remove duplicated history commands",
+			"description": "Indicates whether to remove duplicated history entries.",
+			"default": false
+		},
+		"InsertMode": {
+			"type": "boolean",
+			"title": "Insert mode",
+			"description": "Indicates whether the user types over existing characters.",
+			"default": false
+		},
+		"LoadConIme": {
+			"type": "boolean",
+			"title": "Load Console IME on logon",
+			"description": "Indicates whether the IME proxy process for the Windows 2000 console (Conime.exe) is loaded automatically when log on to Windows 2000.",
+			"default": true
+		},
+		"NumberOfHistoryBuffers": {
+			"type": "integer",
+			"title": "Number of history buffers",
+			"description": "Specifies the number of history buffers allocated to store commands.",
+			"minimum": 1,
+			"maximum": 999,
+			"default": 4
+		},
+		"OhMyPoshConfig": {
+			"type": "string",
+			"title": "Oh My Posh configuration file",
+			"description": "Specifies the name or full path of the Oh My Posh configuration file."
+		},
+		"PopupColors": {
+			"type": "string",
+			"title": "Popup colors",
+			"description": "Specifies both foreground and background colors used in popup windows by color name.",
+			"pattern": "^(Black|DarkBlue|DarkGreen|DarkCyan|DarkRed|DarkMagenta|DarkYellow|Gray|DarkGray|Blue|Green|Cyan|Red|Magenta|Yellow|White),\\s*(Black|DarkBlue|DarkGreen|DarkCyan|DarkRed|DarkMagenta|DarkYellow|Gray|DarkGray|Blue|Green|Cyan|Red|Magenta|Yellow|White)$",
+			"default": "White, DarkCyan"
+		},
+		"PROMPT": {
+			"type": "string",
+			"title": "Prompt",
+			"description": "Specifies the command prompt. %C (computer name) and %U (user name) can be used in order to extend the default prompt special character combinations (https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/prompt#remarks)",
+			"default": "$P$G"
+		},
+		"QuickEdit": {
+			"type": "boolean",
+			"title": "Quick edit",
+			"description": "Indicates whether user can cut and paste text by using the mouse.",
+			"default": false
+		},
+		"ScreenBufferSize": {
+			"type": "string",
+			"title": "Screen buffer size",
+			"description": "Specifies the size of the screen buffer (the screen that is retained in memory). If the size of the screen displayed on the monitor is smaller than the screen buffer, its can be scrolled to see the entire screen.",
+			"pattern": "^[0-9]{1,4}x[0-9]{1,4}$",
+			"default": "80x25"
+		},
+		"ScreenColors": {
+			"type": "string",
+			"title": "Main colors",
+			"description": "Specifies both foreground and background colors used in the console by color name.",
+			"pattern": "^(Black|DarkBlue|DarkGreen|DarkCyan|DarkRed|DarkMagenta|DarkYellow|Gray|DarkGray|Blue|Green|Cyan|Red|Magenta|Yellow|White),\\s*(Black|DarkBlue|DarkGreen|DarkCyan|DarkRed|DarkMagenta|DarkYellow|Gray|DarkGray|Blue|Green|Cyan|Red|Magenta|Yellow|White)$",
+			"default": "Black, Gray"
+		},
+		"WindowAlpha": {
+			"type": "integer",
+			"title": "Window transparency",
+			"description": "Specifies the opacity of the console window (where 0 is transparent and 255 is opaque).",
+			"default": 255,
+			"minimum": 0,
+			"maximum": 255
+		},
+		"WindowSize": {
+			"type": "string"
+		}
+	}
+}
