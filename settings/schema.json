@@ -44,7 +44,7 @@
 		"FontFamily": {
 			"type": "boolean",
 			"title": "True Type font",
-			"description": "Indicates whether the font is True Type."
+			"description": "Specifies whether the font is True Type."
 		},
 		"FontSize": {
 			"type": "string",
@@ -56,13 +56,13 @@
 		"FontWeight": {
 			"type": "boolean",
 			"title": "Font bold",
-			"description": "Indicates whether the font is bold.",
+			"description": "Specifies whether the font is bold.",
 			"default": false
 		},
 		"FullScreen": {
 			"type": "boolean",
 			"title": "Full screen",
-			"description": "Indicates whether the command window is set to open in full-screen mode.",
+			"description": "Specifies whether the command window is set to open in full-screen mode.",
 			"default": false
 		},
 		"HistoryBufferSize": {
@@ -76,19 +76,19 @@
 		"HistoryNoDup": {
 			"type": "boolean",
 			"title": "Remove duplicated history commands",
-			"description": "Indicates whether to remove duplicated history entries.",
+			"description": "Specifies whether to remove duplicated history entries.",
 			"default": false
 		},
 		"InsertMode": {
 			"type": "boolean",
 			"title": "Insert mode",
-			"description": "Indicates whether the user types over existing characters.",
+			"description": "Specifies whether the user types over existing characters.",
 			"default": false
 		},
 		"LoadConIme": {
 			"type": "boolean",
 			"title": "Load Console IME on logon",
-			"description": "Indicates whether the IME proxy process for the Windows 2000 console (Conime.exe) is loaded automatically when log on to Windows 2000.",
+			"description": "Specifies whether the IME proxy process for the Windows 2000 console (Conime.exe) is loaded automatically when log on to Windows 2000.",
 			"default": true
 		},
 		"NumberOfHistoryBuffers": {
@@ -120,7 +120,7 @@
 		"QuickEdit": {
 			"type": "boolean",
 			"title": "Quick edit",
-			"description": "Indicates whether user can cut and paste text by using the mouse.",
+			"description": "Specifies whether user can cut and paste text by using the mouse.",
 			"default": false
 		},
 		"ScreenBufferSize": {
@@ -146,7 +146,11 @@
 			"maximum": 255
 		},
 		"WindowSize": {
-			"type": "string"
+			"type": "string",
+			"title": "Screen size",
+			"description": "Specifies the size of the screen in characters.",
+			"pattern": "^[0-9]{1,4}x[0-9]{1,4}$",
+			"default": "80x25"
 		}
 	}
 }
