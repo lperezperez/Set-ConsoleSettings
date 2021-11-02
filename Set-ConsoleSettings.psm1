@@ -1,4 +1,4 @@
-$Script:BoolValues = @("false", "true") # Boolean strings
+﻿$Script:BoolValues = @("false", "true") # Boolean strings
 # ─── Color map ────────────────────────────────────────────────────────────────
 $Script:ColorMap = @{
 	"Black" = @{
@@ -218,23 +218,41 @@ $Script:TypeMap = @{
 # ─── Adds the type for each console color registry property ───────────────────
 $index = 0
 [Enum]::GetValues([ConsoleColor]) | ForEach-Object { $Script:TypeMap.Add("ColorTable$(($index++).ToString('00'))", "color") }
-function Assert-DayLight([switch]$GeoLocation, [DateTime]$Sunrise = ("8:00" | Get-Date), [DateTime]$Sunset = ("19:00" | Get-Date)) {
+function Assert-DayLight {
 	<#
 		.SYNOPSIS
-			Affirms if currently theme will be light.
+		Asserts if currently a light theme shold be used.
 		.DESCRIPTION
-			Gets a value indicating whether the theme will match light (%true) or dark ($false).
+		Gets a value indicating whether the theme will match light ($true) or dark ($false).
 		.PARAMETER GeoLoction
-			The return value will be set based on the current device time (daylight hours based through the device Geo-Location).
+		The return value will be set based on the current device time (daylight hours based through the device Geo-Location).
 		.PARAMETER Sunset
-			Indicates the local sunrise time when the `Geolocation` switch is set (in case its cannot be retrieved through the device Geo-Location).
-			Its default value is: 8:00AM
+		Indicates the local sunrise time when the `Geolocation` switch is set (in case its cannot be retrieved through the device Geo-Location).
+		Its default value is: 8:00AM
 		.PARAMETER Sunshine
-			Indicates the local sunshine time when the `Geolocation` switch is set (in case its cannot be retrieved through the device Geo-Location).
-			Its default value is: 7:00PM
+		Indicates the local sunshine time when the `Geolocation` switch is set (in case its cannot be retrieved through the device Geo-Location).
+		Its default value is: 7:00PM
+		.EXAMPLE
+		Assert-DayLight
+
+		Asserts if currently a light theme shold be used based on the current Windows theme. 
+		.EXAMPLE
+		Assert-DayLight -GeoLocation
+
+		Asserts if currently a light theme shold be used based on the current device time (daylight hours based through the device Geo-Location).
+		.EXAMPLE
+		Assert-DayLight -GeoLocation -Sunrise "7:00" -Sunset "20:00"
+
+		Asserts if currently a light theme shold be used based on the current device time (daylight hours based through the device Geo-Location). In case Geo-Location could not be retrieved, the sunrise and sunset hours specified will be used to check if currently is day light.
 		.NOTES
-			By default, this method uses the current Windows theme (for coherence).
+		By default, this method uses the current Windows theme (for coherence with system light mode).
 	#>
+	param
+	(
+		[switch]$GeoLocation,
+		[DateTime]$Sunrise = ("8:00" | Get-Date),
+		[DateTime]$Sunset = ("19:00" | Get-Date)
+	)
 	if (-not $GeoLocation) {
 		# ─── Get current Windows theme ───────────────────────────────────
 		$appsUseLightTheme = Get-ItemPropertyValue "Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" "AppsUseLightTheme"
@@ -405,12 +423,11 @@ function Install-WingetPackage {
 		.PARAMETER PackageName
 		The name of the package to check or install.
 	#>
-	[CmdletBinding()]
-	param ([string]$PackageName
-	)
+	[CmdletBinding(SupportsShouldProcess)]
+	param ([string]$PackageName)
 	if (-not (Get-Command $PackageName -ErrorAction SilentlyContinue)) {
 		if (Get-Command winget -ErrorAction SilentlyContinue) {
-			winget install $PackageName
+			if ($PSCmdlet.ShouldProcess("Install $PackageName")) { winget install $PackageName }
 			if ($LASTEXITCODE -ne 0) {
 				Write-Debug "$PackageName was not installed."
 				return $false
@@ -428,63 +445,89 @@ function Install-WingetPackage {
 	}
 	return $false
 }
-function Set-CommonColors {
+function Set-CommonColor {
 	<#
 		.SYNOPSIS
 		Sets the common console colors to Base16 color scheme.
 		.DESCRIPTION
 		Sets the PowerShell common console colors accordiong to Base16 (https://github.com/chriskempson/base16) color scheme.
 	#>
+	[CmdletBinding(SupportsShouldProcess)]
+  param()
 	if ($Host.PrivateData.DebugBackgroundColor -ne [ConsoleColor]::Black) {
-		$Host.PrivateData.DebugBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-		Write-DebugColorUpdate $([ConsoleColor]::Black) "Debug background"
+		if ($PSCmdlet.ShouldProcess("DebugBackgroundColor")) {
+			$Host.PrivateData.DebugBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+			Write-DebugColorUpdate $([ConsoleColor]::Black) "Debug background"
+		}
 	}
 	if ($Host.PrivateData.DebugForegroundColor -ne [ConsoleColor]::DarkGray) {
-		$Host.PrivateData.DebugForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
-		Write-DebugColorUpdate $([ConsoleColor]::DarkGray) "Debug foreground"
+		if ($PSCmdlet.ShouldProcess("DebugForegroundColor")) {
+			$Host.PrivateData.DebugForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+			Write-DebugColorUpdate $([ConsoleColor]::DarkGray) "Debug foreground"
+		}
 	}
 	if ($Host.PrivateData.ErrorBackgroundColor -ne [ConsoleColor]::Black) {
-		$Host.PrivateData.ErrorBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-		Write-DebugColorUpdate $([ConsoleColor]::Black) "Error background"
+		if ($PSCmdlet.ShouldProcess("ErrorBackgroundColor")) {
+			$Host.PrivateData.ErrorBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+			Write-DebugColorUpdate $([ConsoleColor]::Black) "Error background"
+		}
 	}
 	if ($Host.PrivateData.ErrorForegroundColor -ne [ConsoleColor]::Red) {
-		$Host.PrivateData.ErrorForegroundColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff deleted.
-		Write-DebugColorUpdate $([ConsoleColor]::Red) "Error foreground"
+		if ($PSCmdlet.ShouldProcess("ErrorForegroundColor")) {
+			$Host.PrivateData.ErrorForegroundColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff deleted.
+			Write-DebugColorUpdate $([ConsoleColor]::Red) "Error foreground"
+		}
 	}
 	if ($Host.PrivateData.ProgressBackgroundColor -ne [ConsoleColor]::DarkBlue) {
-		$Host.PrivateData.ProgressBackgroundColor = [ConsoleColor]::DarkBlue # base01 Lighter Background (Used for status bars).
-		Write-DebugColorUpdate $([ConsoleColor]::DarkBlue) "Progress background"
+		if ($PSCmdlet.ShouldProcess("ProgressBackgroundColor")) {
+			$Host.PrivateData.ProgressBackgroundColor = [ConsoleColor]::DarkBlue # base01 Lighter Background (Used for status bars).
+			Write-DebugColorUpdate $([ConsoleColor]::DarkBlue) "Progress background"
+		}
 	}
 	if ($Host.PrivateData.ProgressForegroundColor -ne [ConsoleColor]::White) {
-		$Host.PrivateData.ProgressForegroundColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
-		Write-DebugColorUpdate $([ConsoleColor]::White) "Progress foreground"
+		if ($PSCmdlet.ShouldProcess("ProgressForegroundColor")) {
+			$Host.PrivateData.ProgressForegroundColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
+			Write-DebugColorUpdate $([ConsoleColor]::White) "Progress foreground"
+		}
 	}
 	if ($Host.PrivateData.VerboseBackgroundColor -ne [ConsoleColor]::Black) {
-		$Host.PrivateData.VerboseBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-		Write-DebugColorUpdate $([ConsoleColor]::Black) "Verbose background"
+		if ($PSCmdlet.ShouldProcess("VerboseBackgroundColor")) {
+			$Host.PrivateData.VerboseBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+			Write-DebugColorUpdate $([ConsoleColor]::Black) "Verbose background"
+		}
 	}
 	if ($Host.PrivateData.VerboseForegroundColor -ne [ConsoleColor]::DarkGray) {
-		$Host.PrivateData.VerboseForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
-		Write-DebugColorUpdate $([ConsoleColor]::DarkGray) "Verbose foreground"
-	}
+		if ($PSCmdlet.ShouldProcess("VerboseForegroundColor")) {
+			$Host.PrivateData.VerboseForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+			Write-DebugColorUpdate $([ConsoleColor]::DarkGray) "Verbose foreground"
+		}
+}
 	if ($Host.PrivateData.WarningBackgroundColor -ne [ConsoleColor]::Black) {
-		$Host.PrivateData.WarningBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-		Write-DebugColorUpdate $([ConsoleColor]::Black) "Warning background"
+		if ($PSCmdlet.ShouldProcess("WarningBackgroundColor")) {
+			$Host.PrivateData.WarningBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+			Write-DebugColorUpdate $([ConsoleColor]::Black) "Warning background"
+		}
 	}
 	if ($Host.PrivateData.WarningForegroundColor -ne [ConsoleColor]::Yellow) {
-		$Host.PrivateData.WarningForegroundColor = [ConsoleColor]::Yellow # base0e Keywords, Storage, Selector, Markup Italic, Diff changed.
-		Write-DebugColorUpdate $([ConsoleColor]::Yellow) "Warning foreground"
+		if ($PSCmdlet.ShouldProcess("WarningForegroundColor")) {
+			$Host.PrivateData.WarningForegroundColor = [ConsoleColor]::Yellow # base0e Keywords, Storage, Selector, Markup Italic, Diff changed.
+			Write-DebugColorUpdate $([ConsoleColor]::Yellow) "Warning foreground"
+		}
 	}
 	if ($Host.UI.RawUI.BackgroundColor -ne [ConsoleColor]::Black) {
-		$Host.UI.RawUI.BackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-		Write-DebugColorUpdate $([ConsoleColor]::Black) "Background"
-	}
+		if ($PSCmdlet.ShouldProcess("BackgroundColor")) {
+			$Host.UI.RawUI.BackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
+			Write-DebugColorUpdate $([ConsoleColor]::Black) "Background"
+		}
+}
 	if ($Host.UI.RawUI.ForegroundColor -ne [ConsoleColor]::Gray) {
-		$Host.UI.RawUI.ForegroundColor = [ConsoleColor]::Gray # base05 Default Foreground, Caret, Delimiters, Operators.
-		Write-DebugColorUpdate $([ConsoleColor]::Gray) "Foreground"
+		if ($PSCmdlet.ShouldProcess("ForegroundColor")) {
+			$Host.UI.RawUI.ForegroundColor = [ConsoleColor]::Gray # base05 Default Foreground, Caret, Delimiters, Operators.
+			Write-DebugColorUpdate $([ConsoleColor]::Gray) "Foreground"
+		}
 	}
 }
-function Set-ConsoleSettings {
+function Set-ConsoleConfiguration {
 	<#
 		.SYNOPSIS
 		Sets the console settings.
@@ -494,14 +537,28 @@ function Set-ConsoleSettings {
 		The file path (or file name without extension under 'Settings' directory) that contains the console settings.
 		.PARAMETER ShowInfo
 		Shows the console information when starts.
-		.PARAMETER Debug
-		Shows debug messages.
+		.EXAMPLE
+		Set-ConsoleConfiguration
+
+		Sets the console settings specified in the default configuration file at .\Settings\ConsoleSettings.json.
+		.EXAMPLE
+		Set-ConsoleConfiguration -File .\Path\To\Settings.json
+
+		Sets the console settings specified in the -File parameter.
+		.EXAMPLE
+		Set-ConsoleConfiguration -File .\Path\To\Settings.json -ShowInfo
+
+		Sets the console settings specified in the -File parameter and shows info of the current console instance.
+		.EXAMPLE
+		Set-ConsoleConfiguration -ShowInfo
+
+		Sets the console settings specified in the default configuration file at .\Settings\ConsoleSettings.json and shows info of the current console instance.
 	#>
+	[CmdletBinding(SupportsShouldProcess)]
 	param
 	(
 		[string]$File = "$PSScriptRoot\Settings\ConsoleSettings.json",
-		[switch]$ShowInfo,
-		[switch]$Debug
+		[switch]$ShowInfo
 	)
 	if ($Debug) { $DebugPreference = "Continue" } # Write debug if specified.
 	Install-WingetPackage gsudo | Out-Null
@@ -519,18 +576,16 @@ function Set-ConsoleSettings {
 	$settings.Keys | ForEach-Object {
 		$consolePropertyValue = ((Get-ItemProperty $consoleRegistryPath).$_)
 		if ($null -ne $consolePropertyValue -and $consolePropertyValue -ne $settings[$_]) {
-			Set-ItemProperty $consoleRegistryPath $_ $settings[$_]
+			Set-ItemProperty -Path $consoleRegistryPath -Name $_ -Value $settings[$_]
 			Write-Debug "'$consoleRegistryPath\$_' value modified to '$($settings[$_])'"
 		}
 	}
 	# ─── Set the CMD prompt ─────────────────────────────────────────────────────────
 	if ((Get-ItemProperty "HKCU:\Environment").PROMPT -ne $settings["PROMPT"]) {
-		Set-ItemProperty "HKCU:\Environment" "PROMPT" $settings["PROMPT"]
+		Set-ItemProperty -Path "HKCU:\Environment" -Name "PROMPT" -Value $settings["PROMPT"]
 		Write-Debug "CMD Prompt changed to '$($settings["PROMPT"])'."
 	}
-	# ─── Set color scheme ───────────────────────────────────────────────────────────
 	if ($null -ne $settings["ColorScheme"]) {
-		$colorScheme = $settings["ColorScheme"]
 		# ─── Sets auto light mode ────────────────────────────────────────
 		if ($null -ne $settings["AutoLightMode"]) {
 			if ($settings["AutoLightMode"]) {
@@ -539,9 +594,9 @@ function Set-ConsoleSettings {
 			}
 		}
 	}
-	Set-CommonColors
+	Set-CommonColor
 	Set-PSReadLine $settings["ContinuationPrompt"]
-	if (Get-FrontEnd -eq "WindowsTerminal") { Set-WindowsTerminal $colorScheme (-not $dayLight) $settings["FaceName"] } # Set Windows Terminal settings.
+	if (Get-FrontEnd -eq "WindowsTerminal") { Set-WindowsTerminal -ColorScheme $settings["ColorScheme"] -CrtEmulation (-not $settings["DayLight"]) -FontFamily $settings["FaceName"] } # Set Windows Terminal settings.
 	if ($null -ne $settings["OhMyPoshConfig"]) { Set-OhMyPosh $settings["OhMyPoshConfig"] } # Set Oh-My-Posh settings.
 	Use-Module Terminal-Icons # Load Terminal-Icons module.
 	if ($ShowInfo) { Show-ConsoleInfo }
@@ -553,15 +608,16 @@ function Set-OhMyPosh {
 		.DESCRIPTION
 		Sets the Oh-My-Posh module options.
 	#>
-	param
-	(
-		[string]$Theme
-	)
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("AvoidUsingInvokeExpression", "", Scope = "Function", Justification = "Invoke-Expression is empty. Is needed to run the third party module. For more information see https://ohmyposh.dev/docs/windows#replace-your-existing-prompt")]
+	[CmdletBinding(SupportsShouldProcess)]
+	param([string]$Theme)
 	$ohMyPoshThemesFolder = Join-Path $env:LOCALAPPDATA "Programs\oh-my-posh\themes"
 	# ─── Set Oh-My-Posh prompt ──────────────────────────────────────────────────
 	if (Install-WingetPackage oh-my-posh) {
-		Copy-Item (Join-Path $PSScriptRoot "settings\Oh-My-Posh\*.omp.json") $ohMyPoshThemesFolder
-		Write-Debug "Oh-My-Posh settings added."
+		if ($PSCmdlet.ShouldProcess("Import Oh My Posh themes")) {
+			Copy-Item (Join-Path $PSScriptRoot "settings\Oh-My-Posh\*.omp.json") $ohMyPoshThemesFolder
+			Write-Debug "Oh-My-Posh settings added."
+	}
 	}
 	if (-not (Test-Path $Theme)) {
 		$Theme = Join-Path $ohMyPoshThemesFolder "$Theme.omp.json"
@@ -577,16 +633,20 @@ function Set-OhMyPosh {
 	Enable-PoshTooltips # Enable Oh-My-Posh tooltips
 	Write-Debug "Oh-My-Posh initialized."
 }
-function Set-PSReadLine([string]$ContinuationPrompt) {
+function Set-PSReadLine {
 	<#
 		.SYNOPSIS
 		Sets PSReadLine options.
 		.DESCRIPTION
 		Sets the `PSReadLine` module options.
 	#>
+	[CmdletBinding(SupportsShouldProcess)]
+	param([string]$ContinuationPrompt)
 	if (-Not (Get-Module -ListAvailable -Name PSReadLine) -or (Get-Module -ListAvailable -Name PSReadLine).Version.Major -lt 2) {
-		sudo Install-Module PSReadLine -AllowPrerelease -Force -SkipPublisherCheck
-		Write-Debug "'PSReadLine' module installed."
+		if ($PSCmdlet.ShouldProcess("Install or update PSReadLine")) {
+			sudo Install-Module PSReadLine -AllowPrerelease -Force -SkipPublisherCheck
+			Write-Debug "'PSReadLine' module installed."
+		}
 		Import-Module PSReadLine
 		Write-Debug "'PSReadLine' module imported."
 	}
@@ -670,6 +730,7 @@ function Set-WindowsTerminal {
 		.PARAMETER FontFamily
 		The font family.
 	#>
+	[CmdletBinding(SupportsShouldProcess)]
 	param
 	(
 		[string]$ColorScheme,
@@ -712,15 +773,24 @@ function Set-WindowsTerminal {
 		Write-Debug "Windows Terminal settings saved to '$wtProfileLocation'."
 	}
 }
-function Show-ANSIColors([switch]$Full) {
+function Show-ANSIColor {
 	<#
 		.SYNOPSIS
 		Shows the ANSI colors.
 		.DESCRIPTION
-		Shows the current 16 ANSI colors.
+		Shows the current 16/256 ANSI colors (16 by default).
 		.PARAMETER Full
 		Shows the 256 ANSI foreground and backgrond colors.
+		.EXAMPLE
+		Show-ANSIColor
+
+		Shows the current 16 ANSI colors.
+		.EXAMPLE
+		Show-ANSIColor -Full
+
+		Shows the current 256 ANSI colors.
 	#>
+	param([switch]$Full)
 	Write-Host
 	if ($Full) {
 		# ─── Shows the 256 ANSI foreground and backgrond colors ──────────
@@ -753,7 +823,7 @@ function Show-ANSIColors([switch]$Full) {
 	}
 	Write-Host
 }
-function Show-ConsoleColors([switch]$Basic, [switch]$PsReadLine) {
+function Show-ConsoleColor {
 	<#
 		.SYNOPSIS
 		Shows the current console colors.
@@ -763,7 +833,25 @@ function Show-ConsoleColors([switch]$Basic, [switch]$PsReadLine) {
 		A value indicating whether to show the colors of the basic tokens.
 		.PARAMETER PsReadLine
 		A value indicating whether to show the colors of the PSReadline tokens.
+		.EXAMPLE
+		Show-ConsoleColor
+
+		Shows the current console colors and the colors specified to all registered tokens.
+		.EXAMPLE
+		Show-ConsoleColor -Basic
+
+		Shows the current console colors and the colors specified to basic tokens.
+		.EXAMPLE
+		Show-ConsoleColor -PsReadLine
+
+		Shows the current console colors and the colors specified to PSReadLine tokens.
 	#>
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("AvoidUsingInvokeExpression", "", Scope = "Function", Justification = "")]
+	param
+	(
+		[switch]$Basic,
+		[switch]$PsReadLine
+	)
 	foreach ($color in $Script:ColorMap.GetEnumerator()) { $color.Value.Tokens = @() } # Clears the tokens assigned to the colors in the colorMap variable.
 	$all = -not $Basic -and -not $PsReadLine
 	if ($all -or $Basic) {
