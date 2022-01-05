@@ -223,7 +223,7 @@ $index = 0
 function Assert-DayLight {
 	<#
 		.SYNOPSIS
-		Asserts if currently a light theme shold be used.
+		Asserts if currently a light theme should be used.
 		.DESCRIPTION
 		Gets a value indicating whether the theme will match light ($true) or dark ($false).
 		.PARAMETER GeoLoction
@@ -237,15 +237,15 @@ function Assert-DayLight {
 		.EXAMPLE
 		Assert-DayLight
 
-		Asserts if currently a light theme shold be used based on the current Windows theme. 
+		Asserts if currently a light theme should be used based on the current Windows theme. 
 		.EXAMPLE
 		Assert-DayLight -GeoLocation
 
-		Asserts if currently a light theme shold be used based on the current device time (daylight hours based through the device Geo-Location).
+		Asserts if currently a light theme should be used based on the current device time (daylight hours based through the device Geo-Location).
 		.EXAMPLE
 		Assert-DayLight -GeoLocation -Sunrise "7:00" -Sunset "20:00"
 
-		Asserts if currently a light theme shold be used based on the current device time (daylight hours based through the device Geo-Location). In case Geo-Location could not be retrieved, the sunrise and sunset hours specified will be used to check if currently is day light.
+		Asserts if currently a light theme should be used based on the current device time (daylight hours based through the device Geo-Location). In case Geo-Location could not be retrieved, the sunrise and sunset hours specified will be used to check if currently is day light.
 		.NOTES
 		By default, this method uses the current Windows theme (for coherence with system light mode).
 	#>
