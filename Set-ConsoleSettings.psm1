@@ -1,4 +1,6 @@
-﻿$Script:BoolValues = @("false", "true") # Boolean strings
+﻿[Diagnostics.CodeAnalysis.SuppressMessageAttribute("AvoidUsingInvokeExpression", "", Scope = "Function", Justification = "Invoke-Expression is empty. Is needed to run the third party module. For more information see https://ohmyposh.dev/docs/windows#replace-your-existing-prompt")]
+param()
+$Script:BoolValues = @("false", "true") # Boolean strings
 # ─── Color map ────────────────────────────────────────────────────────────────
 $Script:ColorMap = @{
 	"Black" = @{
@@ -427,7 +429,7 @@ function Install-WingetPackage {
 	param ([string]$PackageName)
 	if (-not (Get-Command $PackageName -ErrorAction SilentlyContinue)) {
 		if (Get-Command winget -ErrorAction SilentlyContinue) {
-			if ($PSCmdlet.ShouldProcess("Install $PackageName")) { winget install $PackageName }
+			if ($PSCmdlet.ShouldProcess("Install $PackageName")) { winget install -h $PackageName }
 			if ($LASTEXITCODE -ne 0) {
 				Write-Debug "$PackageName was not installed."
 				return $false
@@ -457,74 +459,74 @@ function Set-CommonColor {
 	if ($Host.PrivateData.DebugBackgroundColor -ne [ConsoleColor]::Black) {
 		if ($PSCmdlet.ShouldProcess("DebugBackgroundColor")) {
 			$Host.PrivateData.DebugBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-			Write-DebugColorUpdate $([ConsoleColor]::Black) "Debug background"
 		}
+		Write-DebugColorUpdate $([ConsoleColor]::Black) "Debug background"
 	}
 	if ($Host.PrivateData.DebugForegroundColor -ne [ConsoleColor]::DarkGray) {
 		if ($PSCmdlet.ShouldProcess("DebugForegroundColor")) {
 			$Host.PrivateData.DebugForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
-			Write-DebugColorUpdate $([ConsoleColor]::DarkGray) "Debug foreground"
 		}
+		Write-DebugColorUpdate $([ConsoleColor]::DarkGray) "Debug foreground"
 	}
 	if ($Host.PrivateData.ErrorBackgroundColor -ne [ConsoleColor]::Black) {
 		if ($PSCmdlet.ShouldProcess("ErrorBackgroundColor")) {
 			$Host.PrivateData.ErrorBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-			Write-DebugColorUpdate $([ConsoleColor]::Black) "Error background"
 		}
+		Write-DebugColorUpdate $([ConsoleColor]::Black) "Error background"
 	}
 	if ($Host.PrivateData.ErrorForegroundColor -ne [ConsoleColor]::Red) {
 		if ($PSCmdlet.ShouldProcess("ErrorForegroundColor")) {
 			$Host.PrivateData.ErrorForegroundColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff deleted.
-			Write-DebugColorUpdate $([ConsoleColor]::Red) "Error foreground"
 		}
+		Write-DebugColorUpdate $([ConsoleColor]::Red) "Error foreground"
 	}
 	if ($Host.PrivateData.ProgressBackgroundColor -ne [ConsoleColor]::DarkBlue) {
 		if ($PSCmdlet.ShouldProcess("ProgressBackgroundColor")) {
 			$Host.PrivateData.ProgressBackgroundColor = [ConsoleColor]::DarkBlue # base01 Lighter Background (Used for status bars).
-			Write-DebugColorUpdate $([ConsoleColor]::DarkBlue) "Progress background"
 		}
+		Write-DebugColorUpdate $([ConsoleColor]::DarkBlue) "Progress background"
 	}
 	if ($Host.PrivateData.ProgressForegroundColor -ne [ConsoleColor]::White) {
 		if ($PSCmdlet.ShouldProcess("ProgressForegroundColor")) {
 			$Host.PrivateData.ProgressForegroundColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
-			Write-DebugColorUpdate $([ConsoleColor]::White) "Progress foreground"
 		}
+		Write-DebugColorUpdate $([ConsoleColor]::White) "Progress foreground"
 	}
 	if ($Host.PrivateData.VerboseBackgroundColor -ne [ConsoleColor]::Black) {
 		if ($PSCmdlet.ShouldProcess("VerboseBackgroundColor")) {
 			$Host.PrivateData.VerboseBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-			Write-DebugColorUpdate $([ConsoleColor]::Black) "Verbose background"
 		}
+		Write-DebugColorUpdate $([ConsoleColor]::Black) "Verbose background"
 	}
 	if ($Host.PrivateData.VerboseForegroundColor -ne [ConsoleColor]::DarkGray) {
 		if ($PSCmdlet.ShouldProcess("VerboseForegroundColor")) {
 			$Host.PrivateData.VerboseForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
-			Write-DebugColorUpdate $([ConsoleColor]::DarkGray) "Verbose foreground"
 		}
+		Write-DebugColorUpdate $([ConsoleColor]::DarkGray) "Verbose foreground"
 }
 	if ($Host.PrivateData.WarningBackgroundColor -ne [ConsoleColor]::Black) {
 		if ($PSCmdlet.ShouldProcess("WarningBackgroundColor")) {
 			$Host.PrivateData.WarningBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-			Write-DebugColorUpdate $([ConsoleColor]::Black) "Warning background"
 		}
+		Write-DebugColorUpdate $([ConsoleColor]::Black) "Warning background"
 	}
 	if ($Host.PrivateData.WarningForegroundColor -ne [ConsoleColor]::Yellow) {
 		if ($PSCmdlet.ShouldProcess("WarningForegroundColor")) {
 			$Host.PrivateData.WarningForegroundColor = [ConsoleColor]::Yellow # base0e Keywords, Storage, Selector, Markup Italic, Diff changed.
-			Write-DebugColorUpdate $([ConsoleColor]::Yellow) "Warning foreground"
 		}
+		Write-DebugColorUpdate $([ConsoleColor]::Yellow) "Warning foreground"
 	}
 	if ($Host.UI.RawUI.BackgroundColor -ne [ConsoleColor]::Black) {
 		if ($PSCmdlet.ShouldProcess("BackgroundColor")) {
 			$Host.UI.RawUI.BackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
-			Write-DebugColorUpdate $([ConsoleColor]::Black) "Background"
 		}
+		Write-DebugColorUpdate $([ConsoleColor]::Black) "Background"
 }
 	if ($Host.UI.RawUI.ForegroundColor -ne [ConsoleColor]::Gray) {
 		if ($PSCmdlet.ShouldProcess("ForegroundColor")) {
 			$Host.UI.RawUI.ForegroundColor = [ConsoleColor]::Gray # base05 Default Foreground, Caret, Delimiters, Operators.
-			Write-DebugColorUpdate $([ConsoleColor]::Gray) "Foreground"
 		}
+		Write-DebugColorUpdate $([ConsoleColor]::Gray) "Foreground"
 	}
 }
 function Set-ConsoleConfiguration {
@@ -560,8 +562,9 @@ function Set-ConsoleConfiguration {
 		[string]$File = "$PSScriptRoot\Settings\ConsoleSettings.json",
 		[switch]$ShowInfo
 	)
-	if ($Debug) { $DebugPreference = "Continue" } # Write debug if specified.
 	Install-WingetPackage gsudo | Out-Null
+	Set-Alias -Name sudo -Value gsudo -Option ReadOnly, AllScope -Force # Set alias for gsudo
+	Write-Debug "Alias sudo set for gsudo.exe"
 	# ─── Load settings ──────────────────────────────────────────────────────────────
 	if (!(Test-Path $File)) {
 		Write-Error "File Settings not found: $File" # Show error
@@ -608,7 +611,7 @@ function Set-OhMyPosh {
 		.DESCRIPTION
 		Sets the Oh-My-Posh module options.
 	#>
-	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("AvoidUsingInvokeExpression", "", Scope = "Function", Justification = "Invoke-Expression is empty. Is needed to run the third party module. For more information see https://ohmyposh.dev/docs/windows#replace-your-existing-prompt")]
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("AvoidUsingInvokeExpression", "", Scope = "Function", Justification = "Invoke-Expression is needed to run the third party module. For more information see https://ohmyposh.dev/docs/windows#replace-your-existing-prompt")]
 	[CmdletBinding(SupportsShouldProcess)]
 	param([string]$Theme)
 	$ohMyPoshThemesFolder = Join-Path $env:LOCALAPPDATA "Programs\oh-my-posh\themes"
@@ -629,6 +632,7 @@ function Set-OhMyPosh {
 		return
 	}
 	Write-Debug "Oh My Posh theme set to $Theme"
+	(@(&"C:/Users/lpere/AppData/Local/Programs/oh-my-posh/bin/oh-my-posh.exe" --print-init --shell=pwsh --config="luigitech.omp.json") -join "`n") | Invoke-Expression
 	oh-my-posh --init --shell pwsh --config $Theme | Invoke-Expression # Iinitalize Oh-My-Posh promt
 	Enable-PoshTooltips # Enable Oh-My-Posh tooltips
 	Write-Debug "Oh-My-Posh initialized."
@@ -642,78 +646,102 @@ function Set-PSReadLine {
 	#>
 	[CmdletBinding(SupportsShouldProcess)]
 	param([string]$ContinuationPrompt)
-	if (-Not (Get-Module -ListAvailable -Name PSReadLine) -or (Get-Module -ListAvailable -Name PSReadLine).Version.Major -lt 2) {
-		if ($PSCmdlet.ShouldProcess("Install or update PSReadLine")) {
-			sudo Install-Module PSReadLine -AllowPrerelease -Force -SkipPublisherCheck
-			Write-Debug "'PSReadLine' module installed."
-		}
-		Import-Module PSReadLine
-		Write-Debug "'PSReadLine' module imported."
-	}
 	$options = Get-PSReadlineOption # Get PSReadLine options
 	if ($ContinuationPrompt -and $options.ContinuationPrompt -ne $ContinuationPrompt) {
-		$options.ContinuationPrompt = $ContinuationPrompt # Set continuation prompt
+		if ($PSCmdlet.ShouldProcess("Set continuation prompt")) {
+			$options.ContinuationPrompt = $ContinuationPrompt # Set continuation prompt
+		}
 		Write-Debug "Continuation prompt set to '$ContinuationPrompt'."
 	}
 	# ─── Set colors ─────────────────────────────────────────────────────────────────
 	if ($options.CommandColor -ne [ConsoleColor]::DarkYellow) {
-		$options.CommandColor = [ConsoleColor]::DarkYellow # base0f Deprecated: Opening/Closing Embedded Language Tags (e.g. <?php ?>).
+		if ($PSCmdlet.ShouldProcess("Set command color")) {
+			$options.CommandColor = [ConsoleColor]::DarkYellow # base0f Deprecated: Opening/Closing Embedded Language Tags (e.g. <?php ?>).
+		}
 		Write-Debug "Command color set to $($options.CommandColor)$([ConsoleColor]::DarkYellow)"
 	}
 	if ($options.CommentColor -ne [ConsoleColor]::DarkGray) {
-		$options.CommentColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+		if ($PSCmdlet.ShouldProcess("Set comment color")) {
+			$options.CommentColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+		}
 		Write-Debug "Comment color set to $($options.CommentColor)$([ConsoleColor]::DarkGray)"
 	}
 	if ($options.ContinuationPromptColor -ne [ConsoleColor]::DarkGray) {
-		$options.ContinuationPromptColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+		if ($PSCmdlet.ShouldProcess("Set continuation prompt color")) {
+			$options.ContinuationPromptColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
+		}
 		Write-Debug "Continuation promt color set to $($options.ContinuationPromptColor)$([ConsoleColor]::DarkGray)"
 	}
 	if ($options.DefaultTokenColor -ne [ConsoleColor]::White) {
-		$options.DefaultTokenColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
+		if ($PSCmdlet.ShouldProcess("Set default token color")) {
+			$options.DefaultTokenColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
+		}
 		Write-Debug "Default token color set to $($options.DefaultTokenColor)$([ConsoleColor]::White)"
 	}
 	if ($options.EmphasisColor -ne [ConsoleColor]::White) {
-		$options.EmphasisColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
+		if ($PSCmdlet.ShouldProcess("Set emphasis color")) {
+			$options.EmphasisColor = [ConsoleColor]::White # base06 Light Foreground (Not often used).
+		}
 		Write-Debug "Emphasis color set to $($options.EmphasisColor)$([ConsoleColor]::White)"
 	}
 	if ($options.ErrorColor -ne [ConsoleColor]::Red) {
-		$options.ErrorColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
+		if ($PSCmdlet.ShouldProcess("Set error color")) {
+			$options.ErrorColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
+		}
 		Write-Debug "Error color set to $($options.ErrorColor)$([ConsoleColor]::Red)"
 	}
 	if ($options.KeywordColor -ne [ConsoleColor]::Yellow) {
-		$options.KeywordColor = [ConsoleColor]::Yellow # base0e Keywords, Storage, Selector, Markup Italic, Diff Changed.
+		if ($PSCmdlet.ShouldProcess("Set keyword color")) {
+			$options.KeywordColor = [ConsoleColor]::Yellow # base0e Keywords, Storage, Selector, Markup Italic, Diff Changed.
+		}
 		Write-Debug "Keyword color set to $($options.KeywordColor)$([ConsoleColor]::Yellow)"
 	}
 	if ($options.MemberColor -ne [ConsoleColor]::DarkMagenta) {
-		$options.MemberColor = [ConsoleColor]::DarkMagenta # *base0d Functions, Methods, Attribute IDs, Headings. Review
+		if ($PSCmdlet.ShouldProcess("Set member color")) {
+			$options.MemberColor = [ConsoleColor]::DarkMagenta # *base0d Functions, Methods, Attribute IDs, Headings. Review
+		}
 		Write-Debug "Member color set to $($options.MemberColor)$([ConsoleColor]::DarkMagenta)"
 	}
 	if ($options.NumberColor -ne [ConsoleColor]::Cyan) {
-		$options.NumberColor = [ConsoleColor]::Cyan # base09 Integers, Boolean, Constants, XML Attributes, Markup Link Url.
+		if ($PSCmdlet.ShouldProcess("Set number color")) {
+			$options.NumberColor = [ConsoleColor]::Cyan # base09 Integers, Boolean, Constants, XML Attributes, Markup Link Url.
+		}
 		Write-Debug "Number color set to $($options.NumberColor)$([ConsoleColor]::Cyan)"
 	}
 	if ($options.OperatorColor -ne [ConsoleColor]::Gray) {
-		$options.OperatorColor = [ConsoleColor]::Gray # *base05 Default Foreground, Caret, Delimiters, Operators. Base16 standard, review
+		if ($PSCmdlet.ShouldProcess("Set operator color")) {
+			$options.OperatorColor = [ConsoleColor]::Gray # *base05 Default Foreground, Caret, Delimiters, Operators. Base16 standard, review
+		}
 		Write-Debug "Operator color set to $($options.OperatorColor)$([ConsoleColor]::Gray)"
 	}
 	if ($options.ParameterColor -ne [ConsoleColor]::DarkRed) {
-		$options.ParameterColor = [ConsoleColor]::DarkRed # *base04 Dark Foreground (Used for status bars). Review
+		if ($PSCmdlet.ShouldProcess("Set parameter color")) {
+			$options.ParameterColor = [ConsoleColor]::DarkRed # *base04 Dark Foreground (Used for status bars). Review
+		}
 		Write-Debug "Parameter color set to $($options.ParameterColor)$([ConsoleColor]::DarkRed)"
 	}
 	if ($options.SelectionColor -ne [ConsoleColor]::DarkGreen) {
-		$options.SelectionColor = [ConsoleColor]::DarkGreen # base02 Selection Background.
+		if ($PSCmdlet.ShouldProcess("Set selection color")) {
+			$options.SelectionColor = [ConsoleColor]::DarkGreen # base02 Selection Background.
+		}
 		Write-Debug "Selection color set to $($options.SelectionColor)$([ConsoleColor]::DarkGreen)"
 	}
 	if ($options.StringColor -ne [ConsoleColor]::Green) {
-		$options.StringColor = [ConsoleColor]::Green # base0b Strings, Inherited Class, Markup Code, Diff Inserted.
+		if ($PSCmdlet.ShouldProcess("Set string color")) {
+			$options.StringColor = [ConsoleColor]::Green # base0b Strings, Inherited Class, Markup Code, Diff Inserted.
+		}
 		Write-Debug "String color set to $($options.StringColor)$([ConsoleColor]::Green)"
 	}
 	if ($options.TypeColor -ne [ConsoleColor]::Magenta) {
-		$options.TypeColor = [ConsoleColor]::Magenta # base0a Classes, Markup Bold, Search Text Background.
+		if ($PSCmdlet.ShouldProcess("Set type color")) {
+			$options.TypeColor = [ConsoleColor]::Magenta # base0a Classes, Markup Bold, Search Text Background.
+		}
 		Write-Debug "Type color set to $($options.TypeColor)$([ConsoleColor]::Magenta)"
 	}
 	if ($options.VariableColor -ne [ConsoleColor]::Red) {
-		$options.VariableColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
+		if ($PSCmdlet.ShouldProcess("Set variable color")) {
+			$options.VariableColor = [ConsoleColor]::Red # base08 Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted.
+		}
 		Write-Debug "Variable color set to $($options.VariableColor)$([ConsoleColor]::Red)"
 	}
 }
@@ -761,7 +789,7 @@ function Set-WindowsTerminal {
 		$changed = $true
 		Write-Debug "CRT emulation set to '$crtEmulation'."
 	}
-	$fontFamilyPropertyName = '"fontFace":'
+	$fontFamilyPropertyName = '"face":'
 	$fontFamilyProperty = $fontFamilyPropertyName + ' "(.*?)"'
 	if ($wtProfile -match $fontFamilyProperty -and $Matches[1] -ne $FontFamily) {
 		$wtProfile = $wtProfile -replace $fontFamilyProperty, ($fontFamilyPropertyName + ' "' + $FontFamily + '"')
@@ -787,7 +815,6 @@ function Show-ANSIColor {
 		Shows the current 16 ANSI colors.
 		.EXAMPLE
 		Show-ANSIColor -Full
-
 		Shows the current 256 ANSI colors.
 	#>
 	param([switch]$Full)
@@ -835,15 +862,12 @@ function Show-ConsoleColor {
 		A value indicating whether to show the colors of the PSReadline tokens.
 		.EXAMPLE
 		Show-ConsoleColor
-
 		Shows the current console colors and the colors specified to all registered tokens.
 		.EXAMPLE
 		Show-ConsoleColor -Basic
-
 		Shows the current console colors and the colors specified to basic tokens.
 		.EXAMPLE
 		Show-ConsoleColor -PsReadLine
-
 		Shows the current console colors and the colors specified to PSReadLine tokens.
 	#>
 	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("AvoidUsingInvokeExpression", "", Scope = "Function", Justification = "")]
@@ -869,18 +893,10 @@ function Show-ConsoleColor {
 		$PSReadLineModule = Get-Module PSReadLine
 		if ($null -ne $PSReadLineModule) {
 			$options = Get-PSReadlineOption
-			if ($PSReadLineModule.Version.Major -ge 2) {
-				foreach ($token in ($options | Get-Member *Color -MemberType Property | ForEach-Object { $_.Name -replace "(.+)Color", '$1' })) {
-					$ansiColor = [regex]::Replace((Invoke-Expression "`$options.$($token)Color.ToString()"), ".*\[((?:\d{1,3};?)+)m", '$1')
-					$color = ($Script:ColorMap.GetEnumerator() | Where-Object { $_.Value.ANSI.FG -in ($ansiColor -split ";") } | Select-Object -First 1).Key
-					$Script:ColorMap[$color].Tokens += $token
-				}
-			}
-			else {
-				foreach ($token in ($options | Get-Member *ForegroundColor -MemberType Property | ForEach-Object { $_.Name -replace "(.+)ForegroundColor", "$1" })) {
-					$color = Invoke-Expression "`$options.$($token)ForegroundColor.ToString()"
-					$Script:ColorMap[$color].Tokens += $token
-				}
+			foreach ($token in ($options | Get-Member *Color -MemberType Property | ForEach-Object { $_.Name -replace "(.+)Color", '$1' })) {
+				$ansiColor = [regex]::Replace((Invoke-Expression "`$options.$($token)Color.ToString()"), ".*\[((?:\d{1,3};?)+)m", '$1')
+				$color = ($Script:ColorMap.GetEnumerator() | Where-Object { $_.Value.ANSI.FG -in ($ansiColor -split ";") } | Select-Object -First 1).Key
+				$Script:ColorMap[$color].Tokens += $token
 			}
 		}
 	}
@@ -947,22 +963,39 @@ function Show-ConsoleInfo {
 	Write-Host " ``ººººººººººººººººººººººººººººººººº" -ForegroundColor Blue
 	Write-Host
 }
-function Use-Module([string]$ModuleName) {
+function Use-Module {
 	<#
 		.SYNOPSIS
 		Loads the specified module.
 		.DESCRIPTION
-		Istalls (if not installed) and imports the specified module.
+		Installs (if not installed) and imports the specified module.
 		.PARAMETER ModuleName
 		The module name to load.
 	#>
-	if (-Not (Get-Module -ListAvailable -Name $ModuleName)) {
+	[CmdletBinding(SupportsShouldProcess)]
+	param([string]$ModuleName)
+	if (-not (Get-Module -ListAvailable -Name $ModuleName) -and ($PSCmdlet.ShouldProcess("Install module $ModuleName"))) {
 		sudo Install-Module $ModuleName
 		Write-Debug "Module $ModuleName installed."
 	} # Install module
 	Import-Module $ModuleName # Import module
 	Write-Debug "Module $ModuleName imported."
 }
-function Write-DebugColorUpdate($colorName, [string]$description) {
-	Write-Debug "$description color set to $(Get-ANSIColor $ColorMap["$colorName"] $colorName)."
+function Write-DebugColorUpdate {
+	<#
+		.SYNOPSIS
+		Writes a debug message for an updated color.
+		.DESCRIPTION
+		Writes a debug message with the description of the updated token and the color set.
+		.PARAMETER ColorName
+		The name of the color to set.
+		.PARAMETER Description
+		The name of the update token color.
+	#>
+	param
+	(
+		[string]$ColorName,
+		[string]$Description
+	)
+	Write-Debug "$Description color set to $(Get-ANSIColor $ColorMap["$ColorName"] $ColorName)."
 }
