@@ -3,7 +3,7 @@
 	ModuleVersion = "0.0.2"
 	GUID = "76b72f26-3582-4655-b90f-54df4a197c1c"
 	Author = "Luis Pérez"
-	Copyright = "2021 © Luis Pérez"
+	Copyright = "2022 © Luis Pérez"
 	Description = "Sets default console settings."
 	RequiredModules = @(
 		@{ ModuleName = "PSReadLine"; ModuleVersion = "2.0.0"; Guid = "5714753b-2afd-4492-a5fd-01d9e2cff8b5" },
