@@ -2,7 +2,7 @@
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://example.com/ConsoleSettings",
 	"title": "Set-ConsoleSettings definition scheme",
-	"description": "Settings used for the Set-ConsoleSettings cmdlet (https://github.com/lperezperez/Set-ConsoleSettings).",
+	"description": "Settings used for the Set-ConsoleConfiguration cmdlet (https://github.com/lperezperez/Set-ConsoleSettings).",
 	"type": "object",
 	"properties": {
 		"AutoLightMode": {
@@ -39,7 +39,8 @@
 		"FaceName": {
 			"type": "string",
 			"title": "Font name",
-			"description": "Specifies the name of an alternate command window font. If the font name in empty, the system uses raster fonts."
+			"description": "Specifies the name of an alternate command window font. If the font name in empty, the system uses raster fonts.",
+			"default": ""
 		},
 		"FontFamily": {
 			"type": "boolean",
