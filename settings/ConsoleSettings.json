@@ -1,10 +1,9 @@
 {
-	"$schema": "https://raw.githubusercontent.com/lperezperez/Set-ConsoleSettings/develop/settings/schema.json",
+	"$schema": "https://raw.githubusercontent.com/lperezperez/Set-ConsoleSettings/master/settings/schema.json",
 	"AutoLightMode": true,
 	"ColorScheme": "GruvboxMedium",
 	"ContinuationPrompt": " ",
 	"CursorSize": "Large",
-	"FaceName": "Operator Mono ScreenSmart",
 	"FontFamily": true,
 	"FontSize": "9x20",
 	"HistoryBufferSize": 999,
