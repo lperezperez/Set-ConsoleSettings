@@ -763,7 +763,7 @@ function Set-WindowsTerminal {
 	(
 		[string]$ColorScheme,
 		[bool]$CrtEmulation,
-		[string]$FontFamily
+		[string]$FontFamily = ""
 	)
 	# ─── Get profile location ───────────────────────────────────────────────────────
 	$wtProfileLocation = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal"
@@ -789,12 +789,14 @@ function Set-WindowsTerminal {
 		$changed = $true
 		Write-Debug "CRT emulation set to '$crtEmulation'."
 	}
-	$fontFamilyPropertyName = '"face":'
-	$fontFamilyProperty = $fontFamilyPropertyName + ' "(.*?)"'
-	if ($wtProfile -match $fontFamilyProperty -and $Matches[1] -ne $FontFamily) {
-		$wtProfile = $wtProfile -replace $fontFamilyProperty, ($fontFamilyPropertyName + ' "' + $FontFamily + '"')
-		$changed = $true
-		Write-Debug "Font changed from '$($Matches[1])' to '$FontFamily'."
+	if ($FontFamily) {
+		$fontFamilyPropertyName = '"face":'
+		$fontFamilyProperty = $fontFamilyPropertyName + ' "(.*?)"'
+		if ($wtProfile -match $fontFamilyProperty -and $Matches[1] -ne $FontFamily) {
+			$wtProfile = $wtProfile -replace $fontFamilyProperty, ($fontFamilyPropertyName + ' "' + $FontFamily + '"')
+			$changed = $true
+			Write-Debug "Font changed from '$($Matches[1])' to '$FontFamily'."
+		}
 	}
 	if ($changed) {
 		Set-Content -Path $wtProfileLocation -Value $wtProfile
