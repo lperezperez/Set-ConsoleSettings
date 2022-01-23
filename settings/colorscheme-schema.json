@@ -1,0 +1,121 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://example.com/ConsoleSettingsColors",
+	"title": "Set-ConsoleSettings colors definition scheme",
+	"description": "Colors used for the Set-ConsoleConfiguration cmdlet (https://github.com/lperezperez/Set-ConsoleSettings).",
+	"type": "object",
+	"properties": {
+		"ColorTable00": {
+			"type": "string",
+			"title": "Black color",
+			"description": "Specifies the hex color value for Black color (ConsoleColor: Black, CMD: Black, ANSI: Black).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#0C0C0C"
+		},
+		"ColorTable01": {
+			"type": "string",
+			"title": "Dark-blue color",
+			"description": "Specifies the hex color value for Dark-blue color (ConsoleColor: DarkBlue, CMD: Blue, ANSI: Blue).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#0037DA"
+		},
+		"ColorTable02": {
+			"type": "string",
+			"title": "Dark-green color",
+			"description": "Specifies the hex color value for Dark-green color (ConsoleColor: DarkGreen, CMD: Green, ANSI: Green).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#13A10E"
+		},
+		"ColorTable03": {
+			"type": "string",
+			"title": "Dark-cyan color",
+			"description": "Specifies the hex color value for Dark-cyan color (ConsoleColor: DarkCyan, CMD: Aqua, ANSI: Cyan).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#3A96DD"
+		},
+		"ColorTable04": {
+			"type": "string",
+			"title": "Dark-red color",
+			"description": "Specifies the hex color value for Dark-red color (ConsoleColor: DarkRed, CMD: Red, ANSI: Red).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#C50F1F"
+		},
+		"ColorTable05": {
+			"type": "string",
+			"title": "Dark-magenta color",
+			"description": "Specifies the hex color value for Dark-magenta color (ConsoleColor: DarkMagenta, CMD: Purple, ANSI: Magenta).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#881798"
+		},
+		"ColorTable06": {
+			"type": "string",
+			"title": "Dark-yellow color",
+			"description": "Specifies the hex color value for Dark-yellow color (ConsoleColor: DarkYellow, CMD: Yellow, ANSI: Yellow).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#C19C00"
+		},
+		"ColorTable07": {
+			"type": "string",
+			"title": "Gray color",
+			"description": "Specifies the hex color value for Gray color (ConsoleColor: Gray, CMD: White, ANSI: White).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#CCCCCC"
+		},
+		"ColorTable08": {
+			"type": "string",
+			"title": "Dark-gray color",
+			"description": "Specifies the hex color value for Dark-gray color (ConsoleColor: DarkGray, CMD: Gray, ANSI: Bright Black).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#767676"
+		},
+		"ColorTable09": {
+			"type": "string",
+			"title": "Blue color",
+			"description": "Specifies the hex color value for Blue color (ConsoleColor: Blue, CMD: Light Blue, ANSI: Bright Blue).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#3B78FF"
+		},
+		"ColorTable10": {
+			"type": "string",
+			"title": "Green color",
+			"description": "Specifies the hex color value for Green color (ConsoleColor: Green, CMD: Light Green, ANSI: Bright Green).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#16C60C"
+		},
+		"ColorTable11": {
+			"type": "string",
+			"title": "Cyan color",
+			"description": "Specifies the hex color value for Cyan color (ConsoleColor: Cyan, CMD: Light Aqua, ANSI: Bright Cyan).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#61D6D6"
+		},
+		"ColorTable12": {
+			"type": "string",
+			"title": "Red color",
+			"description": "Specifies the hex color value for Red color (ConsoleColor: Red, CMD: Light Red, ANSI: Bright Red).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#E74856"
+		},
+		"ColorTable13": {
+			"type": "string",
+			"title": "Magenta color",
+			"description": "Specifies the hex color value for Magenta color (ConsoleColor: Magenta, CMD: Light Purple, ANSI: Bright Magenta).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#B4009E"
+		},
+		"ColorTable14": {
+			"type": "string",
+			"title": "Yellow",
+			"description": "Specifies the hex color value for Yellow color (ConsoleColor: Yellow, CMD: Light Yellow, ANSI: Bright Yellow).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#F9F1A5"
+		},
+		"ColorTable15": {
+			"type": "string",
+			"title": "White",
+			"description": "Specifies the hex color value for White color (ConsoleColor: White, CMD: Bright White, ANSI: Bright White).",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+			"default": "#F2F2F2"
+		}
+	}
+}
