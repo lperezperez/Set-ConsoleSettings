@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/lperezperez/Set-ConsoleSettings/master/settings/colorscheme-schema.json",
   "ColorTable00": "#fbf1c7",
   "ColorTable01": "#ebdbb2",
   "ColorTable02": "#d5c4a1",
