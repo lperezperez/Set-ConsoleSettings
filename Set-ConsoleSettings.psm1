@@ -1,6 +1,5 @@
 ﻿[Diagnostics.CodeAnalysis.SuppressMessageAttribute("AvoidUsingInvokeExpression", "", Scope = "Function", Justification = "Invoke-Expression is empty. Is needed to run the third party module. For more information see https://ohmyposh.dev/docs/windows#replace-your-existing-prompt")]
 param()
-$Script:BoolValues = @("false", "true") # Boolean strings
 # ─── Color map ────────────────────────────────────────────────────────────────
 $Script:ColorMap = @{
 	"Black" = @{
@@ -148,16 +147,16 @@ $Script:ColorMap = @{
 		"Tokens" = @()
 	}
 	"Red" = @{
-			"ANSI" = @{
-				"Name" = "Bright Red"
-				"FG" = "91"
-				"BG" = "101"
-			}
-			"Cmd" = @{
-				"Name" = "Light Red"
-				"Index" = 12
-			}
-			"Tokens" = @()
+		"ANSI" = @{
+			"Name" = "Bright Red"
+			"FG" = "91"
+			"BG" = "101"
+		}
+		"Cmd" = @{
+			"Name" = "Light Red"
+			"Index" = 12
+		}
+		"Tokens" = @()
 	}
 	"Magenta" = @{
 		"ANSI" = @{
@@ -196,30 +195,30 @@ $Script:ColorMap = @{
 		"Tokens" = @()
 	}
 }
-# ─── Maps console registry setting types ──────────────────────────────────────
-$Script:TypeMap = @{
-	"CursorSize" = "cursor" # Specifies the percentage of a character cell that is occupied by the cursor. This setting affects the default window. Values: Small (25%), Medium (50%) or Large (100%).
-	"FaceName" = "string" # Specifies the name of an alternate command window font. If the font name is empty, the system uses raster fonts.
-	"FontFamily" = "isTrueType" # Indicates whether the font is True Type.
-	"FontSize" = "size" # Specifies the size of the font in pixels.
-	"FontWeight" = "bold" # Specifies whether the font is bold.
-	"FullScreen" = "boolean" # Determines whether the console is set to open in full-screen mode.
-	"HistoryBufferSize" = "integer" # Specifies the number of commands that can be stored in each command history buffer.
-	"HistoryNoDup" = "boolean" # Indicates whether to remove duplicate history entries.
-	"InsertMode" = "boolean" # Determines how the system behaves when the user types over existing characters.
-	"LoadConIme" = "boolean" # Determines whether or not the IME proxy process for the Windows 2000 console (Conime.exe) is loaded automatically when you log on to Windows 2000.
+# ─── Maps console registry key setting types ──────────────────────────────────
+$Script:ConsoleRegistryTypeMap = @{
+	"CursorSize"             = "cursor" # Specifies the percentage of a character cell that is occupied by the cursor. This setting affects the default window. Values: Small (25%), Medium (50%) or Large (100%).
+	"FaceName"               = "string" # Specifies the name of an alternate command window font. If the font name is empty, the system uses raster fonts.
+	"FontFamily"             = "isTrueType" # Indicates whether the font is True Type.
+	"FontSize"               = "size" # Specifies the size of the font in pixels.
+	"FontWeight"             = "bold" # Specifies whether the font is bold.
+	"FullScreen"             = "boolean" # Determines whether the console is set to open in full-screen mode.
+	"HistoryBufferSize"      = "integer" # Specifies the number of commands that can be stored in each command history buffer.
+	"HistoryNoDup"           = "boolean" # Indicates whether to remove duplicate history entries.
+	"InsertMode"             = "boolean" # Determines how the system behaves when the user types over existing characters.
+	"LoadConIme"             = "boolean" # Determines whether or not the IME proxy process for the Windows 2000 console (Conime.exe) is loaded automatically when you log on to Windows 2000.
 	"NumberOfHistoryBuffers" = "integer" # Specifies the number of history buffers allocated to store commands.
-	"PopupColors" = "fgBgColors" # Specifies both foreground and background colors used in popup windows by color name.
-	"QuickEdit" = "boolean" # Determines whether QuickEdit mode is enabled. In QuickEdit mode, users can cut and paste text by using the mouse.
-	"ScreenBufferSize" = "size" # Specifies the size of the screen buffer (the screen that is retained in memory). If the size of the screen displayed on the monitor is smaller than the screen buffer, its can be scrolled to see the entire screen.
-	"ScreenColors" = "fgBgColors" # Specifies both foreground and background colors used in the console by color name.
-	"WindowAlpha" = "integer" # Specifies the opacity of the console window (where 0 is transparent and 255 is opaque).
-	"WindowPosition" = "size" # Specifies the position of the command window on the user's screen.
-	"WindowSize" = "size" # Specifies the size of the command window (in columns and rows).
+	"PopupColors"            = "fgBgColors" # Specifies both foreground and background colors used in popup windows by color name.
+	"QuickEdit"              = "boolean" # Determines whether QuickEdit mode is enabled. In QuickEdit mode, users can cut and paste text by using the mouse.
+	"ScreenBufferSize"       = "size" # Specifies the size of the screen buffer (the screen that is retained in memory). If the size of the screen displayed on the monitor is smaller than the screen buffer, its can be scrolled to see the entire screen.
+	"ScreenColors"           = "fgBgColors" # Specifies both foreground and background colors used in the console by color name.
+	"WindowAlpha"            = "integer" # Specifies the opacity of the console window (where 0 is transparent and 255 is opaque).
+	"WindowPosition"         = "size" # Specifies the position of the command window on the user's screen.
+	"WindowSize"             = "size" # Specifies the size of the command window (in columns and rows).
 }
 # ─── Adds the type for each console color registry property ───────────────────
 $index = 0
-[Enum]::GetValues([ConsoleColor]) | ForEach-Object { $Script:TypeMap.Add("ColorTable$(($index++).ToString('00'))", "color") }
+[Enum]::GetValues([ConsoleColor]) | ForEach-Object { $Script:ConsoleRegistryTypeMap.Add("ColorTable$(($index++).ToString('00'))", "color") }
 function Assert-DayLight {
 	<#
 		.SYNOPSIS
@@ -289,91 +288,49 @@ function Assert-DayLight {
 	Write-Debug "Daytime: $daylight"
 	return $daylight
 }
-function ConvertTo-Registry($Value, [string]$Type) {
+function ConvertTo-Registry($value) {
 	<#
 		.SYNOPSIS
 		Converts data to Windows registry format.
 		.DESCRIPTION
-		Converts the specified `Value` of the specified `Type` to its Windows registry data format.
-		.PARAMETER Value
-		The value to convert.
-		.PARAMETER Type
-		The type of data to convert.
+		Converts the specified `value` to its Windows registry data format.
+		.PARAMETER value
+		The value to convert (both the type [0] and value [1]).
 	#>
-	switch ($Type) {
-		"boolean" {
-			if ($Value) {
-				return 1
-			}
-			else {
-				return 0
-			}
-		}
+	switch ($value[0]) {
+		"boolean" { return $value[1] ? 1 : 0 }
 		"color" {
-			if ($Value -notmatch "^#[\da-f]{6}$") {
-				Write-Error "Invalid color: $Value. Color must be in Hex format. e.g.: #000000."
-				exit 1
-			}
-			$bytes = [BitConverter]::GetBytes([Convert]::ToInt32($Value.Substring(1, 6), 16))
-			for ($i = 3; $i -gt 0; $i--) {
-				$bytes[$i] = $bytes[$i - 1]
-			}
+			if ($value[1] -notmatch "^#[\da-f]{6}$") { throw "Invalid color: $($value[1]). Color must be in Hex format. e.g.: #000000." }
+			$bytes = [BitConverter]::GetBytes([Convert]::ToInt32($value[1].Substring(1, 6), 16))
+			for ($i = 3; $i -gt 0; $i--) { $bytes[$i] = $bytes[$i - 1] }
 			$bytes[0] = 0
 			[Array]::Reverse($bytes)
 			return [BitConverter]::ToInt32($bytes, 0)
 		}
 		"cursor" {
-			switch ($Value) {
-				"Small" {
-					return 0x19
-				}
-				"Medium" {
-					return 0x32
-				}
-				"Large" {
-					return 0x64
-				}
+			switch ($value[1]) {
+				"Small" { return 0x19 }
+				"Medium" { return 0x32 }
+				"Large" { return 0x64 }
 				default {
-					Write-Warning "Invalid cursor size '$Value'. By default, setting to 'Large'."
+					Write-Warning "Invalid cursor size '$value[1]'. By default, setting to 'Large'."
 					return 0x19
 				}
 			}
 		}
 		"size" {
-			if ($Value -notmatch "^\d+x\d+$") {
-				Write-Error "Invalid size: $Value."
-				exit 1
-			}
-			$size = $Value.Split("x") | ForEach-Object { [BitConverter]::GetBytes([Int16]::Parse($_)) }
+			if ($value[1] -notmatch "^\d+x\d+$") { throw "Invalid size: $($value[1])." }
+			$size = $value[1].Split("x") | ForEach-Object { [BitConverter]::GetBytes([Int16]::Parse($_)) }
 			return [BitConverter]::ToInt32(@($size[0], $size[1], $size[2], $size[3]), 0)
 		}
 		"fgBgColors" {
-			$foreground, $background = $Value.Split(",")
-			if (!$foreground -or !$background) {
-				Write-Error "Invalid foreground or background color: $Value."
-				exit 1
-			}
+			$foreground, $background = $value[1].Split(",")
+			if (!$foreground -or !$background) { throw "Invalid foreground or background color: $value." }
 			return (Get-ConsoleColorIndex $background) * 16 + (Get-ConsoleColorIndex $foreground)
 		}
-		"bold" {
-			if ($Value) {
-				return 700
-			}
-			else {
-				return 400
-			}
-		}
-		"isTrueType" {
-			if ($Value) {
-				return 54
-			}
-			else {
-				return 0
-			}
-		}
-		default {
-			return $Value
-		}
+		"bold" { return $value[1] ? 700 : 400 }
+		"isTrueType" { return $value[1] ? 54 : 0 }
+		default { return $value[1] }
 	}
 }
 function Get-ANSIColor($colorMapValue, $name) {
@@ -413,8 +370,7 @@ function Get-FrontEnd {
 		Gets the current process host name.
 	#>
 	$currentProcess = Get-CurrentProcess
-	if ($currentProcess.Parent) { return $currentProcess.Parent.ProcessName }
-	return $currentProcess.ProcessName
+	return $currentProcess.Parent ? $currentProcess.Parent.ProcessName : $currentProcess.ProcessName
 }
 function Install-WingetPackage {
 	<#
@@ -455,7 +411,7 @@ function Set-CommonColor {
 		Sets the PowerShell common console colors accordiong to Base16 (https://github.com/chriskempson/base16) color scheme.
 	#>
 	[CmdletBinding(SupportsShouldProcess)]
-  param()
+	param()
 	if ($Host.PrivateData.DebugBackgroundColor -ne [ConsoleColor]::Black) {
 		if ($PSCmdlet.ShouldProcess("DebugBackgroundColor")) {
 			$Host.PrivateData.DebugBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
@@ -503,7 +459,7 @@ function Set-CommonColor {
 			$Host.PrivateData.VerboseForegroundColor = [ConsoleColor]::DarkGray # base03 Comments, Invisibles, Line Highlighting.
 		}
 		Write-DebugColorUpdate $([ConsoleColor]::DarkGray) "Verbose foreground"
-}
+	}
 	if ($Host.PrivateData.WarningBackgroundColor -ne [ConsoleColor]::Black) {
 		if ($PSCmdlet.ShouldProcess("WarningBackgroundColor")) {
 			$Host.PrivateData.WarningBackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
@@ -521,7 +477,7 @@ function Set-CommonColor {
 			$Host.UI.RawUI.BackgroundColor = [ConsoleColor]::Black # base00 Default backgroud.
 		}
 		Write-DebugColorUpdate $([ConsoleColor]::Black) "Background"
-}
+	}
 	if ($Host.UI.RawUI.ForegroundColor -ne [ConsoleColor]::Gray) {
 		if ($PSCmdlet.ShouldProcess("ForegroundColor")) {
 			$Host.UI.RawUI.ForegroundColor = [ConsoleColor]::Gray # base05 Default Foreground, Caret, Delimiters, Operators.
@@ -566,41 +522,41 @@ function Set-ConsoleConfiguration {
 	Set-Alias -Name sudo -Value gsudo -Option ReadOnly, AllScope -Force # Set alias for gsudo
 	Write-Debug "Alias sudo set for gsudo.exe"
 	# ─── Load settings ──────────────────────────────────────────────────────────────
-	if (!(Test-Path $File)) {
+	if (-not (Test-Path $File)) {
 		Write-Error "File Settings not found: $File" # Show error
 		return
 	}
 	Write-Debug "Loading '$File' settings..."
-	$settings = @{}
-	(Get-Content $File | ConvertFrom-Json).PSObject.Properties | ForEach-Object { $settings[$_.Name] = (ConvertTo-Registry $_.Value $Script:TypeMap[$_.Name]) }
-	$settings["PROMPT"] = $settings["PROMPT"].Replace("%C", $env:COMPUTERNAME).Replace("%U", $env:USERNAME)
+	Write-Debug "Loading '$File' settings..."
+	$settings = Get-Content $File | ConvertFrom-Json -Depth 32
 	# ─── Update console properties ───────────────────────────────────
+	$registrySettings = @{}
+	foreach ($setting in ($settings.PSObject.Properties)) {
+		if (-not $Script:ConsoleRegistryTypeMap[$setting.Name]) { continue }
+		$registrySettings[$setting.Name] = ConvertTo-Registry $Script:ConsoleRegistryTypeMap[$setting.Name], $setting.Value
+	}
 	$consoleRegistryPath = "HKCU:\Console"
-	$settings.Keys | ForEach-Object {
+	$registrySettings.Keys | ForEach-Object {
 		$consolePropertyValue = ((Get-ItemProperty $consoleRegistryPath).$_)
-		if ($null -ne $consolePropertyValue -and $consolePropertyValue -ne $settings[$_]) {
-			Set-ItemProperty -Path $consoleRegistryPath -Name $_ -Value $settings[$_]
-			Write-Debug "'$consoleRegistryPath\$_' value modified to '$($settings[$_])'"
+		if ($null -ne $consolePropertyValue -and $consolePropertyValue -ne $registrySettings[$_]) {
+			Set-ItemProperty -Path $consoleRegistryPath -Name $_ -Value $registrySettings[$_]
+			Write-Debug "'$consoleRegistryPath\$_' value modified to '$($registrySettings[$_])'"
 		}
 	}
 	# ─── Set the CMD prompt ─────────────────────────────────────────────────────────
-	if ((Get-ItemProperty "HKCU:\Environment").PROMPT -ne $settings["PROMPT"]) {
-		Set-ItemProperty -Path "HKCU:\Environment" -Name "PROMPT" -Value $settings["PROMPT"]
+	$settings.PROMPT = $settings.PROMPT.Replace("%C", $env:COMPUTERNAME).Replace("%U", $env:USERNAME) # Replace PROMPT wildcards 
+	if ((Get-ItemProperty "HKCU:\Environment").PROMPT -ne $settings.PROMPT) {
+		Set-ItemProperty -Path "HKCU:\Environment" -Name "PROMPT" -Value $settings.PROMPT
 		Write-Debug "CMD Prompt changed to '$($settings["PROMPT"])'."
 	}
-	if ($null -ne $settings["ColorScheme"]) {
-		# ─── Sets auto light mode ────────────────────────────────────────
-		if ($null -ne $settings["AutoLightMode"]) {
-			if ($settings["AutoLightMode"]) {
-				$settings["DayLight"] = Assert-DayLight
-				$settings["ColorScheme"] += @("Dark", "Light")[$settings["DayLight"]]
-			}
-		}
+	# ─── Sets auto light mode ───────────────────────────────────────────────────
+	if ($settings.ColorScheme -and $settings.AutoLightMode) {
+		$settings.ColorScheme += " " + @("Dark", "Light")[(Assert-DayLight)]
 	}
 	Set-CommonColor
-	Set-PSReadLine $settings["ContinuationPrompt"]
-	if (Get-FrontEnd -eq "WindowsTerminal") { Set-WindowsTerminal -ColorScheme $settings["ColorScheme"] -CrtEmulation (-not $settings["DayLight"]) -FontFamily $settings["FaceName"] } # Set Windows Terminal settings.
-	if ($null -ne $settings["OhMyPoshConfig"]) { Set-OhMyPosh $settings["OhMyPoshConfig"] } # Set Oh-My-Posh settings.
+	Set-PSReadLine $settings.ContinuationPrompt
+	if (Get-FrontEnd -eq "WindowsTerminal") { Set-WindowsTerminal -ColorScheme $settings.ColorScheme -CursorShape $settings.CursorSize -FontFamily $settings.FontFace -PixelShader $settings.PixelShader } # Set Windows Terminal settings.
+	if ($null -ne $settings.OhMyPoshConfig) { Set-OhMyPosh $settings.OhMyPoshConfig } # Set Oh-My-Posh settings.
 	Use-Module Terminal-Icons # Load Terminal-Icons module.
 	if ($ShowInfo) { Show-ConsoleInfo }
 }
@@ -620,7 +576,7 @@ function Set-OhMyPosh {
 		if ($PSCmdlet.ShouldProcess("Import Oh My Posh themes")) {
 			Copy-Item (Join-Path $PSScriptRoot "settings\Oh-My-Posh\*.omp.json") $ohMyPoshThemesFolder
 			Write-Debug "Oh-My-Posh settings added."
-	}
+		}
 	}
 	if (-not (Test-Path $Theme)) {
 		$Theme = Join-Path $ohMyPoshThemesFolder "$Theme.omp.json"
@@ -632,8 +588,8 @@ function Set-OhMyPosh {
 		return
 	}
 	Write-Debug "Oh My Posh theme set to $Theme"
-	(@(&"C:/Users/lpere/AppData/Local/Programs/oh-my-posh/bin/oh-my-posh.exe" --print-init --shell=pwsh --config="luigitech.omp.json") -join "`n") | Invoke-Expression
-	oh-my-posh --init --shell pwsh --config $Theme | Invoke-Expression # Iinitalize Oh-My-Posh promt
+	#(@(&(Join-Path $env:LOCALAPPDATA "Programs/oh-my-posh/bin/oh-my-posh.exe") init pwsh --config="luigitech.omp.json") -join "`n") | Invoke-Expression
+	oh-my-posh init pwsh --config $Theme | Invoke-Expression # Iinitalize Oh-My-Posh promt
 	Enable-PoshTooltips # Enable Oh-My-Posh tooltips
 	Write-Debug "Oh-My-Posh initialized."
 }
@@ -753,17 +709,20 @@ function Set-WindowsTerminal {
 		Sets the color scheme, CRT-Emulation and font family for Windows Terminal.
 		.PARAMETER ColorScheme
 		The color scheme.
-		.PARAMETER CrtEmulation
-		A value indicating wheter the CRT emulation is turned on.
+		.PARAMETER CursorShape
+		The cursor shape.
 		.PARAMETER FontFamily
 		The font family.
+		.PARAMETER PixelShader
+		The path of the pixel shader file.
 	#>
 	[CmdletBinding(SupportsShouldProcess)]
 	param
 	(
-		[string]$ColorScheme,
-		[bool]$CrtEmulation,
-		[string]$FontFamily = ""
+		[string]$ColorScheme = "",
+		[string]$CursorShape = "",
+		[string]$FontFamily = "",
+		[string]$PixelShader = ""
 	)
 	# ─── Get profile location ───────────────────────────────────────────────────────
 	$wtProfileLocation = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal"
@@ -773,33 +732,59 @@ function Set-WindowsTerminal {
 	$wtProfileLocation += "_8wekyb3d8bbwe\LocalState\settings.json"
 	if (-not (Test-Path $wtProfileLocation)) { return } # If settings file don't exists, skip.
 	Write-Debug "Opening Windows Terminal settings on '$wtProfileLocation'"
-	$wtProfile = Get-Content -Path $wtProfileLocation -Raw # Get profile
+	$wtProfile = Get-Content -Path $wtProfileLocation | ConvertFrom-Json -Depth 32 # Get profile
 	$changed = $false
-	$colorSchemePropertyName = '"colorScheme":'
-	$colorSchemeProperty = $colorSchemePropertyName + ' "(.*?)"'
-	if ($wtProfile -match $colorSchemeProperty -and $Matches[1] -ne $ColorScheme) {
-		$wtProfile = $wtProfile -replace $colorSchemeProperty, ($colorSchemePropertyName + ' "' + $ColorScheme + '"')
+	# ─── Set color scheme ───────────────────────────────────────────────────────────
+	if (-not $ColorScheme -and $wtProfile.profiles.defaults.colorScheme) {
+		Write-Debug "Color scheme '$($wtProfile.profiles.defaults.colorScheme)' removed."
+		$wtProfile.profiles.defaults.PSObject.Properties.Remove("colorScheme")
 		$changed = $true
-		Write-Debug "Color scheme changed from '$($Matches[1])' to '$ColorScheme'."
 	}
-	$crtEmulationProperty = '"experimental.retroTerminalEffect": '
-	$wrongCrtEmulation = $crtEmulationProperty + $Script:BoolValues[-Not $CrtEmulation]
-	if ($wtProfile -match $wrongCrtEmulation) {
-		$wtProfile = $wtProfile -replace $wrongCrtEmulation, ($crtEmulationProperty + $Script:BoolValues[$CrtEmulation])
+	elseif ($wtProfile.profiles.defaults.colorScheme -ne $ColorScheme) {
+		Write-Debug "Color scheme changed from '$($wtProfile.profiles.defaults.colorScheme)' to '$ColorScheme'."
+		$wtProfile.profiles.defaults.colorScheme = $ColorScheme
 		$changed = $true
-		Write-Debug "CRT emulation set to '$crtEmulation'."
 	}
-	if ($FontFamily) {
-		$fontFamilyPropertyName = '"face":'
-		$fontFamilyProperty = $fontFamilyPropertyName + ' "(.*?)"'
-		if ($wtProfile -match $fontFamilyProperty -and $Matches[1] -ne $FontFamily) {
-			$wtProfile = $wtProfile -replace $fontFamilyProperty, ($fontFamilyPropertyName + ' "' + $FontFamily + '"')
-			$changed = $true
-			Write-Debug "Font changed from '$($Matches[1])' to '$FontFamily'."
-		}
+	# ─── Set cursor shape ───────────────────────────────────────────────────────────
+	switch ($CursorShape) {
+		"Small" { $CursorShape = "underscore" }
+		"Medium" { $CursorShape = "vintage" }
+		"Large" { $CursorShape = "filledBox" }
+	}
+	if (-not $CursorShape -and $wtProfile.profiles.defaults.cursorShape) {
+		Write-Debug "Cursor shape '$($wtProfile.profiles.defaults.cursorShape)' removed."
+		$wtProfile.profiles.defaults.PSObject.Properties.Remove("cursorShape")
+		$changed = $true
+	}
+	elseif ($wtProfile.profiles.defaults.cursorShape -ne $CursorShape) {
+		Write-Debug "Cursor shape changed from '$($wtProfile.profiles.defaults.cursorShape)' to '$CursorShape'."
+		$wtProfile.profiles.defaults.cursorShape = $CursorShape
+		$changed = $true
+	}
+	# ─── Set font family ────────────────────────────────────────────────────────────
+	if (-not $FontFamily -and $wtProfile.profiles.defaults.font.face) {
+		Write-Debug "Font family '$($wtProfile.profiles.defaults.font.face)' removed."
+		$wtProfile.profiles.defaults.font.PSObject.Properties.Remove("face")
+		$changed = $true
+	}
+	elseif ($FontFamily -and $wtProfile.profiles.defaults.font.face -ne $FontFamily) {
+		Write-Debug "Font family changed from '$($wtProfile.profiles.defaults.font.face)' to '$FontFamily'."
+		$wtProfile.profiles.defaults.font.face = $FontFamily
+		$changed = $true
+	}
+	# ─── Set pixel shader ───────────────────────────────────────────────────────────
+	if (-not $PixelShader -and $wtProfile.profiles.defaults."experimental.pixelShaderPath") {
+		Write-Debug "Pixel shader '$($wtProfile.profiles.defaults."experimental.pixelShaderPath")' removed."
+		$wtProfile.profiles.defaults.PSObject.Properties.Remove("experimental.pixelShaderPath")
+		$changed = $true
+	}
+	elseif ($PixelShader -and $wtProfile.profiles.defaults."experimental.pixelShaderPath" -ne $Pix) {
+		Write-Debug "Pixel shader changed from '$($wtProfile.profiles.defaults."experimental.pixelShaderPath")' to '$PixelShader'."
+		$wtProfile.profiles.defaults."experimental.pixelShaderPath" = $PixelShader
+		$changed = $true
 	}
 	if ($changed) {
-		Set-Content -Path $wtProfileLocation -Value $wtProfile
+		$wtProfile | ConvertTo-Json -Depth 32 | Set-Content $wtProfileLocation
 		Write-Debug "Windows Terminal settings saved to '$wtProfileLocation'."
 	}
 }
@@ -817,6 +802,7 @@ function Show-ANSIColor {
 		Shows the current 16 ANSI colors.
 		.EXAMPLE
 		Show-ANSIColor -Full
+
 		Shows the current 256 ANSI colors.
 	#>
 	param([switch]$Full)
