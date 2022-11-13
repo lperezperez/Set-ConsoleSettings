@@ -288,6 +288,7 @@ function Assert-DayLight {
 	Write-Debug "Daytime: $daylight"
 	return $daylight
 }
+function Assert-Admin { return $null -ne (whoami /groups /fo csv | ConvertFrom-Csv | Where-Object { $_.SID -eq "S-1-5-32-544" }) }
 function ConvertTo-Registry($value) {
 	<#
 		.SYNOPSIS
@@ -518,9 +519,12 @@ function Set-ConsoleConfiguration {
 		[string]$File = "$PSScriptRoot\Settings\ConsoleSettings.json",
 		[switch]$ShowInfo
 	)
-	Install-WingetPackage gsudo | Out-Null
-	Set-Alias -Name sudo -Value gsudo -Option ReadOnly, AllScope -Force # Set alias for gsudo
-	Write-Debug "Alias sudo set for gsudo.exe"
+	$isAdmin = Assert-Admin
+	if ($isAdmin) {
+		Install-WingetPackage gsudo | Out-Null
+		Set-Alias -Name sudo -Value gsudo -Option ReadOnly, AllScope -Force # Set alias for gsudo
+		Write-Debug "Alias sudo set for gsudo.exe"
+	}
 	# ─── Load settings ──────────────────────────────────────────────────────────────
 	if (-not (Test-Path $File)) {
 		Write-Error "File Settings not found: $File" # Show error
@@ -557,7 +561,7 @@ function Set-ConsoleConfiguration {
 	Set-PSReadLine $settings.ContinuationPrompt
 	if (Get-FrontEnd -eq "WindowsTerminal") { Set-WindowsTerminal -ColorScheme $settings.ColorScheme -CursorShape $settings.CursorSize -FontFamily $settings.FontFace -PixelShader $settings.PixelShader } # Set Windows Terminal settings.
 	if ($null -ne $settings.OhMyPoshConfig) { Set-OhMyPosh $settings.OhMyPoshConfig } # Set Oh-My-Posh settings.
-	Use-Module Terminal-Icons # Load Terminal-Icons module.
+	Use-Module Terminal-Icons $isAdmin # Load Terminal-Icons module.
 	if ($ShowInfo) { Show-ConsoleInfo }
 }
 function Set-OhMyPosh {
@@ -578,9 +582,7 @@ function Set-OhMyPosh {
 			Write-Debug "Oh-My-Posh settings added."
 		}
 	}
-	if (-not (Test-Path $Theme)) {
-		$Theme = Join-Path $ohMyPoshThemesFolder "$Theme.omp.json"
-	}
+	if (-not (Test-Path $Theme)) { $Theme = Join-Path $ohMyPoshThemesFolder "$Theme.omp.json" }
 	if (-not (Test-Path $Theme)) {
 		Write-Warning "The specified configuration file located at '$Theme' cannot be found."
 		oh-my-posh --init --shell pwsh | Invoke-Expression # Iinitalize Oh-My-Posh promt
@@ -701,6 +703,17 @@ function Set-PSReadLine {
 		Write-Debug "Variable color set to $($options.VariableColor)$([ConsoleColor]::Red)"
 	}
 }
+function Add-JsonProperty {
+	param (
+		[PSObject]$parent,
+		[string]$name,
+		[object]$value
+	)
+	if (-not ($parent.Properties.Name -match $name)) {
+		$parent | Add-Member -Name $name -Value $value
+		Write-Debug "$name property added."
+	}
+}
 function Set-WindowsTerminal {
 	<#
 		.SYNOPSIS
@@ -733,56 +746,84 @@ function Set-WindowsTerminal {
 	if (-not (Test-Path $wtProfileLocation)) { return } # If settings file don't exists, skip.
 	Write-Debug "Opening Windows Terminal settings on '$wtProfileLocation'"
 	$wtProfile = Get-Content -Path $wtProfileLocation | ConvertFrom-Json -Depth 32 # Get profile
-	$changed = $false
-	# ─── Set color scheme ───────────────────────────────────────────────────────────
-	if (-not $ColorScheme -and $wtProfile.profiles.defaults.colorScheme) {
-		Write-Debug "Color scheme '$($wtProfile.profiles.defaults.colorScheme)' removed."
-		$wtProfile.profiles.defaults.PSObject.Properties.Remove("colorScheme")
-		$changed = $true
+	$changed = $true
+	# ─── Set defaults ───────────────────────────────────────────────────────────────
+	if (-not ($wtProfile.profiles.PSObject.Properties.Name -match "defaults")) {
+		Write-Debug "defaults property not exists."
+		$wtProfile.profiles.PSObject.Properties | Add-Member -MemberType NoteProperty -Name "defaults" -Value "@{}"
 	}
-	elseif ($wtProfile.profiles.defaults.colorScheme -ne $ColorScheme) {
-		Write-Debug "Color scheme changed from '$($wtProfile.profiles.defaults.colorScheme)' to '$ColorScheme'."
-		$wtProfile.profiles.defaults.colorScheme = $ColorScheme
-		$changed = $true
-	}
-	# ─── Set cursor shape ───────────────────────────────────────────────────────────
-	switch ($CursorShape) {
-		"Small" { $CursorShape = "underscore" }
-		"Medium" { $CursorShape = "vintage" }
-		"Large" { $CursorShape = "filledBox" }
-	}
-	if (-not $CursorShape -and $wtProfile.profiles.defaults.cursorShape) {
-		Write-Debug "Cursor shape '$($wtProfile.profiles.defaults.cursorShape)' removed."
-		$wtProfile.profiles.defaults.PSObject.Properties.Remove("cursorShape")
-		$changed = $true
-	}
-	elseif ($wtProfile.profiles.defaults.cursorShape -ne $CursorShape) {
-		Write-Debug "Cursor shape changed from '$($wtProfile.profiles.defaults.cursorShape)' to '$CursorShape'."
-		$wtProfile.profiles.defaults.cursorShape = $CursorShape
-		$changed = $true
-	}
-	# ─── Set font family ────────────────────────────────────────────────────────────
-	if (-not $FontFamily -and $wtProfile.profiles.defaults.font.face) {
-		Write-Debug "Font family '$($wtProfile.profiles.defaults.font.face)' removed."
-		$wtProfile.profiles.defaults.font.PSObject.Properties.Remove("face")
-		$changed = $true
-	}
-	elseif ($FontFamily -and $wtProfile.profiles.defaults.font.face -ne $FontFamily) {
-		Write-Debug "Font family changed from '$($wtProfile.profiles.defaults.font.face)' to '$FontFamily'."
-		$wtProfile.profiles.defaults.font.face = $FontFamily
-		$changed = $true
-	}
-	# ─── Set pixel shader ───────────────────────────────────────────────────────────
-	if (-not $PixelShader -and $wtProfile.profiles.defaults."experimental.pixelShaderPath") {
-		Write-Debug "Pixel shader '$($wtProfile.profiles.defaults."experimental.pixelShaderPath")' removed."
-		$wtProfile.profiles.defaults.PSObject.Properties.Remove("experimental.pixelShaderPath")
-		$changed = $true
-	}
-	elseif ($PixelShader -and $wtProfile.profiles.defaults."experimental.pixelShaderPath" -ne $Pix) {
-		Write-Debug "Pixel shader changed from '$($wtProfile.profiles.defaults."experimental.pixelShaderPath")' to '$PixelShader'."
-		$wtProfile.profiles.defaults."experimental.pixelShaderPath" = $PixelShader
-		$changed = $true
-	}
+	if (-not ($wtProfile.profiles.PSObject.Properties.Name -match "defaults")) { Write-Debug "defaults property not not added." }
+	# # if (-not ($wtProfile.profiles.PSObject.Properties.Name -match "defaults")) {
+	# # 	$wtProfile.profiles | Add-Member -MemberType NoteProperty -Name defaults -Value @{}
+	# # 	Write-Debug "Default properties added."
+	# # }
+	# # ─── Set color scheme ───────────────────────────────────────────────────────────
+	# if ($ColorScheme)
+	# {
+	# 	if (-not ($wtProfile.profiles.defaults.PSObject.Properties.Name -match "colorScheme"))
+	# 	{
+	# 		$wtProfile.profiles.defaults | Add-Member -MemberType NoteProperty -Name colorScheme -Value $ColorScheme
+	# 		Write-Debug "Color scheme property added."
+	# 	}
+	# 	if ($wtProfile.profiles.defaults.colorScheme -ne $ColorScheme)
+	# 	{
+	# 		Write-Debug "Color scheme changed from '$($wtProfile.profiles.defaults.colorScheme)' to '$ColorScheme'."
+	# 		$wtProfile.profiles.defaults.colorScheme = $ColorScheme
+	# 		$changed = $true
+	# 	}
+	# }
+	# # ─── Set cursor shape ───────────────────────────────────────────────────────────
+	# switch ($CursorShape)
+	# {
+	# 	"Small" { $CursorShape = "underscore" }
+	# 	"Medium" { $CursorShape = "vintage" }
+	# 	"Large" { $CursorShape = "filledBox" }
+	# }
+	# if ($CursorShape)
+	# {
+	# 	if (-not ($wtProfile.profiles.defaults.PSObject.Properties.Name -match "cursorShape"))
+	# 	{
+	# 		$wtProfile.profiles.defaults | Add-Member -MemberType NoteProperty -Name cursorShape -Value $CursorShape
+	# 		Write-Debug "cursorShape property added."
+	# 	}
+	# 	if ($wtProfile.profiles.defaults.cursorShape -ne $CursorShape)
+	# 	{
+	# 		Write-Debug "cursorShape property changed from '$($wtProfile.profiles.defaults.cursorShape)' to '$CursorShape'."
+	# 		$wtProfile.profiles.defaults.cursorShape = $CursorShape
+	# 		$changed = $true
+	# 	}
+	# }
+	# # ─── Set font family ────────────────────────────────────────────────────────────
+	# if ($FontFamily)
+	# {
+	# 	if (-not ($wtProfile.profiles.defaults.PSObject.Properties.Name -match "font")) {
+	# 		$wtProfile.profiles.defaults | Add-Member -MemberType NoteProperty -Name cursorShape -Value $CursorShape
+	# 		Write-Debug "cursorShape property added."
+	# 	}
+	# 	if ($wtProfile.profiles.defaults.cursorShape -ne $CursorShape) {
+	# 		Write-Debug "cursorShape property changed from '$($wtProfile.profiles.defaults.cursorShape)' to '$CursorShape'."
+	# 		$wtProfile.profiles.defaults.cursorShape = $CursorShape
+	# 		$changed = $true
+	# 	}
+	# 	if ($wtProfile.profiles.defaults.font.face -ne $FontFamily) {
+	# 		Write-Debug "Font family changed from '$($wtProfile.profiles.defaults.font.face)' to '$FontFamily'."
+	# 		$wtProfile.profiles.defaults.font.face = $FontFamily
+	# 		$changed = $true
+	# 	}
+	# }
+	# # ─── Set pixel shader ───────────────────────────────────────────────────────────
+	# if (-not $PixelShader -and $wtProfile.profiles.defaults."experimental.pixelShaderPath")
+	# {
+	# 	Write-Debug "Pixel shader '$($wtProfile.profiles.defaults."experimental.pixelShaderPath")' removed."
+	# 	$wtProfile.profiles.defaults.PSObject.Properties.Remove("experimental.pixelShaderPath")
+	# 	$changed = $true
+	# }
+	# elseif ($PixelShader -and $wtProfile.profiles.defaults."experimental.pixelShaderPath" -ne $Pix)
+	# {
+	# 	Write-Debug "Pixel shader changed from '$($wtProfile.profiles.defaults."experimental.pixelShaderPath")' to '$PixelShader'."
+	# 	$wtProfile.profiles.defaults."experimental.pixelShaderPath" = $PixelShader
+	# 	$changed = $true
+	# }
 	if ($changed) {
 		$wtProfile | ConvertTo-Json -Depth 32 | Set-Content $wtProfileLocation
 		Write-Debug "Windows Terminal settings saved to '$wtProfileLocation'."
@@ -928,13 +969,7 @@ function Show-ConsoleInfo {
 	Write-Host ([System.Environment]::MachineName)
 	Write-Host "    |BBBBBBBBBBBBBBHw    ""HBBBBBBBBBBBB    " -ForegroundColor Blue -NoNewline
 	Write-Host "$(Get-ItemPropertyValue $regKey ProductName) " -ForegroundColor DarkYellow -NoNewline
-	if ([System.Environment]::Is64BitOperatingSystem) {
-		$architecture = "64"
-	}
-	else {
-		$architecture = "86"
-	}
-	Write-Host "$(Get-ItemPropertyValue $regKey DisplayVersion) (x$architecture)"
+	Write-Host "$(Get-ItemPropertyValue $regKey DisplayVersion) (x$([System.Environment]::Is64BitOperatingSystem ? "64" : "86"))"
 	Write-Host "    BBBBBBBBBBBBBBBMH´    IBBBBBBBBBBB|    " -ForegroundColor Blue -NoNewline
 	Write-Host "User:      " -ForegroundColor DarkYellow -NoNewline
 	Write-Host "$([System.Environment]::UserDomainName)\$([System.Environment]::UserName)"
@@ -954,20 +989,31 @@ function Show-ConsoleInfo {
 function Use-Module {
 	<#
 		.SYNOPSIS
-		Loads the specified module.
+		Uses the specified module.
 		.DESCRIPTION
-		Installs (if not installed) and imports the specified module.
+		Tries to download the specified module from a repository, install on the local computer (if not installed) and import to the current session.
 		.PARAMETER ModuleName
 		The module name to load.
+		.PARAMETER IsAdmin
+		A value indicating whether the user has administration privileges in the device.
 	#>
 	[CmdletBinding(SupportsShouldProcess)]
-	param([string]$ModuleName)
-	if (-not (Get-Module -ListAvailable -Name $ModuleName) -and ($PSCmdlet.ShouldProcess("Install module $ModuleName"))) {
-		sudo Install-Module $ModuleName
-		Write-Debug "Module $ModuleName installed."
-	} # Install module
-	Import-Module $ModuleName # Import module
-	Write-Debug "Module $ModuleName imported."
+	param([string]$ModuleName, [bool]$IsAdmin)
+	$installed = Get-Module -ListAvailable -Name $ModuleName # Gets a value indicating whether the module is installed.
+	if (-not $installed) {
+		if ($IsAdmin)
+		{
+			if ($PSCmdlet.ShouldProcess($ModuleName)) { sudo Install-Module $ModuleName }
+			Write-Debug "Module $ModuleName installed."
+			$installed = $true
+		}
+	}
+	if ($installed) {
+		if ($PSCmdlet.ShouldProcess($ModuleName)) { Import-Module $ModuleName }
+		Write-Debug "Module $ModuleName imported."
+		return
+	}
+	Write-Warning "Module $ModuleName cannot be installed."
 }
 function Write-DebugColorUpdate {
 	<#
@@ -980,10 +1026,6 @@ function Write-DebugColorUpdate {
 		.PARAMETER Description
 		The name of the update token color.
 	#>
-	param
-	(
-		[string]$ColorName,
-		[string]$Description
-	)
+	param([string]$ColorName, [string]$Description)
 	Write-Debug "$Description color set to $(Get-ANSIColor $ColorMap["$ColorName"] $ColorName)."
 }
