@@ -61,6 +61,7 @@
 					"style": "powerline",
 					"powerline_symbol": "\uE0B0",
 					"background": "green",
+					"foreground": "black",
 					"properties": {
 						"prefix": " \uE5FF ",
 						"style": "folder"
