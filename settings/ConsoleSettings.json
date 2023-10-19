@@ -14,7 +14,7 @@
 	"OhMyPoshConfig": "luigitech-base16",
 	"PixelShader": "%UserProfile%\\Source\\Repos\\Set-ConsoleSettings\\settings\\hlsl\\vintage.hlsl",
 	"PopupColors": "White, DarkCyan",
-	"PROMPT": "$E[0;30;47m ﲾ %C $E[37;41m$E[0;30;41m  %U $E[31;42m  $P $E[0;32m$E[1;35m ",
+	"PROMPT": "$E[0;30;47m ﲾ %C $E[37;41m$E[0;30;41m  %U $E[31;42m  $P $E[0;32m$E[1;39m ",
 	"QuickEdit": true,
 	"ScreenBufferSize": "80x999",
 	"ScreenColors": "Gray, Black",
