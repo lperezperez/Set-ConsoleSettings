@@ -373,6 +373,24 @@ function Get-FrontEnd {
 	$currentProcess = Get-CurrentProcess
 	return $currentProcess.Parent ? $currentProcess.Parent.ProcessName : $currentProcess.ProcessName
 }
+function Use-Script {
+	<#
+		.SYNOPSIS
+		Checks (and installs if necessary) the specified script.
+		.DESCRIPTION
+		Checks if the specified ScriptName is installed. If not is installed then installs.
+		.PARAMETER PackageName
+		The name of the script to check or install.
+	#>
+	[CmdletBinding(SupportsShouldProcess)]
+	param ([string]$ScriptName)
+	if (-not (Get-Command $ScriptName -ErrorAction SilentlyContinue)) {
+		if ($PSCmdlet.ShouldProcess("Install $PackageName")) {
+			Install-Script -Name $ScriptName -Force -AcceptLicense -Scope CurrentUser
+			Write-Debug "$ScriptName installed."
+		}
+	}
+}
 function Install-WingetPackage {
 	<#
 		.SYNOPSIS
@@ -562,7 +580,11 @@ function Set-ConsoleConfiguration {
 	if (Get-FrontEnd -eq "WindowsTerminal") { Set-WindowsTerminal -ColorScheme $settings.ColorScheme -CursorShape $settings.CursorSize -FontFamily $settings.FontFace -PixelShader $settings.PixelShader } # Set Windows Terminal settings.
 	if ($null -ne $settings.OhMyPoshConfig) { Set-OhMyPosh $settings.OhMyPoshConfig } # Set Oh-My-Posh settings.
 	Use-Module Terminal-Icons $isAdmin # Load Terminal-Icons module.
-	if ($ShowInfo) { Show-ConsoleInfo }
+	if ($ShowInfo) {
+		Use-Script winfetch
+		winfetch
+		# Show-ConsoleInfo
+	}
 }
 function Set-OhMyPosh {
 	<#
