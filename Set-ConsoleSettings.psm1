@@ -427,7 +427,7 @@ function Set-CommonColor {
 		.SYNOPSIS
 		Sets the common console colors to Base16 color scheme.
 		.DESCRIPTION
-		Sets the PowerShell common console colors accordiong to Base16 (https://github.com/chriskempson/base16) color scheme.
+		Sets the PowerShell common console colors according to Base16 (https://github.com/chriskempson/base16) color scheme.
 	#>
 	[CmdletBinding(SupportsShouldProcess)]
 	param()
@@ -548,9 +548,8 @@ function Set-ConsoleConfiguration {
 		Write-Error "File Settings not found: $File" # Show error
 		return
 	}
-	Write-Debug "Loading '$File' settings..."
-	Write-Debug "Loading '$File' settings..."
 	$settings = Get-Content $File | ConvertFrom-Json -Depth 32
+	Write-Debug "Settings loaded from '$File'."
 	# ─── Update console properties ───────────────────────────────────
 	$registrySettings = @{}
 	foreach ($setting in ($settings.PSObject.Properties)) {
@@ -768,32 +767,30 @@ function Set-WindowsTerminal {
 	if (-not (Test-Path $wtProfileLocation)) { return } # If settings file don't exists, skip.
 	Write-Debug "Opening Windows Terminal settings on '$wtProfileLocation'"
 	$wtProfile = Get-Content -Path $wtProfileLocation | ConvertFrom-Json -Depth 32 # Get profile
-	$changed = $true
+	$changed = $false
 	# ─── Set defaults ───────────────────────────────────────────────────────────────
 	if (-not ($wtProfile.profiles.PSObject.Properties.Name -match "defaults")) {
-		Write-Debug "defaults property not exists."
-		$wtProfile.profiles.PSObject.Properties | Add-Member -MemberType NoteProperty -Name "defaults" -Value "@{}"
+		$wtProfile.profiles | Add-Member -MemberType NoteProperty -Name defaults -Value @{}
+		$changed = $true
 	}
-	if (-not ($wtProfile.profiles.PSObject.Properties.Name -match "defaults")) { Write-Debug "defaults property not not added." }
-	# # if (-not ($wtProfile.profiles.PSObject.Properties.Name -match "defaults")) {
-	# # 	$wtProfile.profiles | Add-Member -MemberType NoteProperty -Name defaults -Value @{}
-	# # 	Write-Debug "Default properties added."
-	# # }
-	# # ─── Set color scheme ───────────────────────────────────────────────────────────
-	# if ($ColorScheme)
-	# {
-	# 	if (-not ($wtProfile.profiles.defaults.PSObject.Properties.Name -match "colorScheme"))
-	# 	{
-	# 		$wtProfile.profiles.defaults | Add-Member -MemberType NoteProperty -Name colorScheme -Value $ColorScheme
-	# 		Write-Debug "Color scheme property added."
-	# 	}
-	# 	if ($wtProfile.profiles.defaults.colorScheme -ne $ColorScheme)
-	# 	{
-	# 		Write-Debug "Color scheme changed from '$($wtProfile.profiles.defaults.colorScheme)' to '$ColorScheme'."
-	# 		$wtProfile.profiles.defaults.colorScheme = $ColorScheme
-	# 		$changed = $true
-	# 	}
-	# }
+	# ─── Set color scheme ───────────────────────────────────────────────────────────
+	if ($ColorScheme)
+	{
+		if (-not ($wtProfile.profiles.defaults.PSObject.Properties.Name -match "colorScheme"))
+		{
+			#$wtProfile.profiles.defaults | Add-Member -MemberType NoteProperty -Name colorScheme -Value $ColorScheme
+			Add-Member -InputObject $wtProfile.profiles.defaults -MemberType NoteProperty -Name colorScheme -Value $ColorScheme
+			$wtProfile.profiles.defaults.colorScheme = $ColorScheme
+			$changed = $true
+			Write-Debug "Color scheme property added to '$ColorScheme'."
+		}
+		if ($wtProfile.profiles.defaults.colorScheme -ne $ColorScheme)
+		{
+			Write-Debug "Color scheme changed from '$($wtProfile.profiles.defaults.colorScheme)' to '$ColorScheme'."
+			$wtProfile.profiles.defaults.colorScheme = $ColorScheme
+			$changed = $true
+		}
+	}
 	# # ─── Set cursor shape ───────────────────────────────────────────────────────────
 	# switch ($CursorShape)
 	# {
@@ -805,8 +802,10 @@ function Set-WindowsTerminal {
 	# {
 	# 	if (-not ($wtProfile.profiles.defaults.PSObject.Properties.Name -match "cursorShape"))
 	# 	{
-	# 		$wtProfile.profiles.defaults | Add-Member -MemberType NoteProperty -Name cursorShape -Value $CursorShape
-	# 		Write-Debug "cursorShape property added."
+	# 		#$wtProfile.profiles.defaults | Add-Member -MemberType NoteProperty -Name cursorShape -Value $CursorShape
+	# 		Add-Member -InputObject $wtProfile.profiles.defaults -MemberType NoteProperty -Name cursorShape -Value $CursorShape
+	# 		$changed = $true
+	# 		Write-Debug "cursorShape property added to '$CursorShape'."
 	# 	}
 	# 	if ($wtProfile.profiles.defaults.cursorShape -ne $CursorShape)
 	# 	{
@@ -819,13 +818,13 @@ function Set-WindowsTerminal {
 	# if ($FontFamily)
 	# {
 	# 	if (-not ($wtProfile.profiles.defaults.PSObject.Properties.Name -match "font")) {
-	# 		$wtProfile.profiles.defaults | Add-Member -MemberType NoteProperty -Name cursorShape -Value $CursorShape
-	# 		Write-Debug "cursorShape property added."
-	# 	}
-	# 	if ($wtProfile.profiles.defaults.cursorShape -ne $CursorShape) {
-	# 		Write-Debug "cursorShape property changed from '$($wtProfile.profiles.defaults.cursorShape)' to '$CursorShape'."
-	# 		$wtProfile.profiles.defaults.cursorShape = $CursorShape
+	# 		$wtProfile.profiles.defaults | Add-Member -MemberType NoteProperty -Name font -Value @{}
+	# 		#$wtProfile.profiles.defaults.font = @{}
 	# 		$changed = $true
+	# 		Write-Debug "Font property added."
+	# 	}
+	# 	if (-not ($wtProfile.profiles.defaults.font.PSObject.Properties.Name -match "face")) {
+	# 		Write-Debug "Font face property added."
 	# 	}
 	# 	if ($wtProfile.profiles.defaults.font.face -ne $FontFamily) {
 	# 		Write-Debug "Font family changed from '$($wtProfile.profiles.defaults.font.face)' to '$FontFamily'."
@@ -836,15 +835,22 @@ function Set-WindowsTerminal {
 	# # ─── Set pixel shader ───────────────────────────────────────────────────────────
 	# if (-not $PixelShader -and $wtProfile.profiles.defaults."experimental.pixelShaderPath")
 	# {
-	# 	Write-Debug "Pixel shader '$($wtProfile.profiles.defaults."experimental.pixelShaderPath")' removed."
 	# 	$wtProfile.profiles.defaults.PSObject.Properties.Remove("experimental.pixelShaderPath")
 	# 	$changed = $true
+	# 	Write-Debug "Pixel shader '$($wtProfile.profiles.defaults."experimental.pixelShaderPath")' removed."
 	# }
-	# elseif ($PixelShader -and $wtProfile.profiles.defaults."experimental.pixelShaderPath" -ne $Pix)
-	# {
-	# 	Write-Debug "Pixel shader changed from '$($wtProfile.profiles.defaults."experimental.pixelShaderPath")' to '$PixelShader'."
-	# 	$wtProfile.profiles.defaults."experimental.pixelShaderPath" = $PixelShader
-	# 	$changed = $true
+	# elseif ($PixelShader) {
+	# 	if (-not ($wtProfile.profiles.defaults.PSObject.Properties.Name -match "experimental.pixelShaderPath")) {
+	# 		$wtProfile.profiles.defaults | Add-Member -MemberType NoteProperty -Name "experimental.pixelShaderPath" -Value $PixelShader
+	# 		#$wtProfile.profiles.defaults | Add-Member -NotePropertyName "experimental.pixelShaderPath" -NotePropertyValue $PixelShader
+	# 		$changed = $true
+	# 		Write-Debug "Pixel shader added: '$PixelShader'"
+	# 	}
+	# 	if ($wtProfile.profiles.defaults."experimental.pixelShaderPath" -ne $PixelShader) {
+	# 		Write-Debug "Pixel shader changed from '$($wtProfile.profiles.defaults."experimental.pixelShaderPath")' to '$PixelShader'."
+	# 		$wtProfile.profiles.defaults."experimental.pixelShaderPath" = $PixelShader
+	# 		$changed = $true
+	# 	}
 	# }
 	if ($changed) {
 		$wtProfile | ConvertTo-Json -Depth 32 | Set-Content $wtProfileLocation
