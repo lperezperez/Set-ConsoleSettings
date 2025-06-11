@@ -1,105 +1,91 @@
-#define CURVATURE .22 // Set the screen curvature. Comment to disable.
-//#define MONOCHROME float4(0, 1, 0, 0) // Set monochrome color. Comment to disable.
-//#define SHADOW_BORDER .01 // Set the inner shadow border. Comment to disable.
-#define NOISE .05 // Set noise intensity. Comment to disable.
-#define REFRESH 2.5 // Set refresh rate and height. Comment to disable.
-#define SCANLINE_FACTOR .5 // Set scan line factor. Comment to disable.
-
-Texture2D shaderTexture;
-SamplerState samplerState;
-cbuffer PixelShaderSettings
-{
-	float Time;
-	float Scale;
-	float2 Resolution;
-	float4 Background;
+// --- Defines for effects ---
+// Comment/Uncomment to deactivate/activate each desired effect. Adjust values as per your preference.
+#define SCREEN_CURVATURE .2 // Strength of the screen curvature (higher = more curved). Typical values: .05 to .3
+#define SCANLINE_THICKNESS .2 // Thickness of each scanline (in pixels). Adjust based on 'Scale' or resolution.
+#define SCANLINE_FACTOR .5 // Scanline darkness factor (0 to 1). Higher = darker.
+#define SCANLINE_BLUR_AMOUNT 1 // Sigma for a small vertical blur. 
+#define NOISE_INTENSITY 16 // Noise intensity.
+// #define MONOCHROME_COLOR float4(.4, 1, .4, 1) // Monochromatic color (Red, Green, Blue, Alpha). e.g. Vintage green: float4(.4, 1, .4, 1)
+#define REFRESH_PERIOD 2 // Sweep period in seconds (time for a complete cycle).
+#define REFRESH_BAR_HEIGHT .2 // Sweep band height (as a fraction of screen height, e.g. .1 = 10%).
+#define REFRESH_BAR_INTENSITY .05 // Intensity of lightning by the sweep (0 to 1).
+#define SHADOW_BORDER_LENGTH .02 // Percentage length of the shadow based on shorter side of the screen rectangle (0 to .5).
+#define SHADOW_BORDER_INTENSITY .5 // Shadow darkness (0 to 1).
+// Resources
+Texture2D shaderTexture : register(t0);
+SamplerState samplerState : register(s0);
+cbuffer PixelShaderSettings : register(b0) {
+	float Time; // Total elapsed time, in seconds.
+	float Scale; // Could be used to adjust effects based on DPI/UI scale.
+	float2 Resolution; // Input texture resolution (width, height).
+	float4 Background; // Background color.
 };
-float getGrayScale(float4 color) { return (color.x + color.y + color.z) / 3; }
-float gaussian2D(float x, float y, int sampleCount, float sigma)
+// Calculates the luminance (perceived brightness) of a color using standard coefficients for RGB channels.
+// Parameters:
+//   color: The input color as a float4 (RGBA).
+// Returns:
+//   The luminance value as a float, in the range 0 to 1.
+float getLuminance(float4 color) { return dot(color.rgb, float3(.299, .587, .114)); }
+// --- Main shader ---
+float4 main(float4 screenPos : SV_POSITION, float2 texCoord : TEXCOORD0) : SV_TARGET
 {
-	sampleCount /= 2;
-	x -= sampleCount;
-	y -= sampleCount;
-	return 1 / (sigma * sqrt(2 * 3.14159265)) * exp(-0.5 * (pow(x, 2) + pow(y, 2)) / pow(sigma, 2));
-}
-float4 blur(Texture2D input, uint2 size, float2 text, float sigma)
-{
-	const int sampleCount = 8;
-	uint width, height;
-	shaderTexture.GetDimensions(width, height);
-	float2 texel = float2(1.f / width, 1.f / height);
-	float4 color = { 0, 0, 0, 0 };
-	sigma *= 2;
-	for (int x = 0; x < sampleCount; x++)
-	{
-		float2 samplePos = { text.x + (x - sampleCount / 2) * texel.x, 0 };
-		for (int y = 0; y < sampleCount; y++)
-		{
-			samplePos.y = text.y + (y - sampleCount / 2) * texel.y;
-			if (samplePos.x > 0 && samplePos.y > 0 && samplePos.x < size.x && samplePos.y < size.y)
-				color += input.Sample(samplerState, samplePos) * gaussian2D(x, y, sampleCount, sigma);
-		}
-	}
-	return color;
-}
-float4 darkenColor(float4 color, float length, float position, float alpha)
-{
-	if (position < length) color.rgb -= (length - position) / length / 2 * alpha;
-	return color;
-}
-float4 innerShadow(float4 color, float2 tex, uint2 size, float border, float alpha)
-{
-	color = darkenColor(color, border, tex.x, alpha);
-	color = darkenColor(color, border, 1 - tex.x, alpha);
-	color = darkenColor(color, border, tex.y, alpha);
-	return darkenColor(color, border, 1 - tex.y, alpha);
-}
-float permute(float x) { return 289 * frac(x * (34 * x + 1) / 289.0f); }
-float4 main(float4 pos : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
-{
-	uint2 size;
-	shaderTexture.GetDimensions(size.x, size.y);
-	#ifdef CURVATURE
-	// Set screen curvature.
-	const float curvature = .5;
-	tex.xy -= curvature; // Offcenter screen
-	tex.xy *= CURVATURE / (curvature / 10) + pow(tex.x, 2) + pow(tex.y, 2); // Apply ratio
-	tex.xy *= CURVATURE; // Zoom
-	tex.xy += curvature; // Move back to center
-	// Outter box
-	float oRatio = CURVATURE / 100;
-	if (tex.x < -oRatio || tex.y < -oRatio) return float4(0, 0, 0, 0); 
-	if (tex.x > 1 + oRatio || tex.y > 1 + oRatio) return float4(0, 0, 0, 0); 
+	float2 uv = texCoord; // Instance an editable copy of texture coordinates.
+	// ─── Screen Curvature Effect. ────────────────────────────────────────────────
+	#ifdef SCREEN_CURVATURE
+	float2 centeredUV = uv - .5; // Move the origin to the centre of the screen (0,0).
+	centeredUV *= (1 + dot(centeredUV, centeredUV) * SCREEN_CURVATURE); // Apply barrel distortion.
+	centeredUV *= 1 / (1 + SCREEN_CURVATURE / 4); // Zoom based on SCREEN_CURVATURE.
+	uv = centeredUV + .5; // return to (0,1).
+	if (uv.x < 0 || uv.x > 1 || uv.y < 0 || uv.y > 1) return Background; // Discard pixels which overflows the screen.
 	#endif
-	float4 color = shaderTexture.Sample(samplerState, tex.xy);
+	float4 color = shaderTexture.Sample(samplerState, uv); // Sample original texture with coordinates.
+	// ─── Scanline Effect. ────────────────────────────────────────────────────────
+	#ifdef SCANLINE_BLUR_AMOUNT
+	const float w[3] = { .227027, .316216, .07027 }; // w[0], w[1], w[2] (symmetric)
+	float2 texelSize = 1 / Resolution;
+	// Central sample.
+	color *= w[0];
+	float totalWeight = w[0];
+	// Side samples.
+	float2 texelOffsetDir = float2(0, texelSize.y * SCANLINE_BLUR_AMOUNT); // Vertical blur direction.
+	for (int i = 1; i <= 2; ++i)
+		color += (shaderTexture.Sample(samplerState, uv + texelOffsetDir * i) * w[i] + shaderTexture.Sample(samplerState, uv - texelOffsetDir * i) * w[i]) * (1 + SCANLINE_FACTOR);
+	#endif
+	#ifdef SCANLINE_THICKNESS
 	#ifdef SCANLINE_FACTOR
-	// Add scan lines
-	if (getGrayScale(Background) < 0.5)
-		color += blur(shaderTexture, size, tex, Scale) * 0.3;
-	color *= (1 - (floor(pos.y / Scale) % 2) * SCANLINE_FACTOR);
-	#endif	
-	#ifdef MONOCHROME
-	// Set monochrome
-	float grayscale = getGrayScale(color);
-	color = float4(grayscale, grayscale, grayscale, 0) * MONOCHROME;
+	float screenY = texCoord.y * Resolution.y;
+	if (floor(screenY / SCANLINE_THICKNESS) % 1.5)
+    color = lerp(color, Background, SCANLINE_FACTOR);
 	#endif
-	#ifdef SHADOW_BORDER
-	// Set screen shadow.
-	color = innerShadow(color, tex, size, SHADOW_BORDER, .5);
-	// Set border
 	#endif
-	#ifdef REFRESH
-	// Set refresh effect
-	float timeOver = fmod(Time / REFRESH, 1);
-	float refreshHeight = REFRESH / 15;
-	if (tex.y > timeOver && tex.y - refreshHeight < timeOver) color.rgb -= (timeOver - tex.y) * refreshHeight;
+	// ─── Monochrome Effect. ──────────────────────────────────────────────────────
+	#ifdef MONOCHROME_COLOR
+	color = float4(getLuminance(color) * MONOCHROME_COLOR.rgb, MONOCHROME_COLOR.a);
 	#endif
-	#ifdef NOISE
-	// Add noise
-	float3 m = float3(tex, Time % 5 / 5) + 1;
-	float q = (.95 * frac(permute(permute(permute(m.x) + m.y) + m.z) / 41.) + .025) - .5;
-	float r2 = pow(q, 2);
-	color.rgb += NOISE * q * (1.365020122861334 + (-.5303572634357367 * r2 + .151015505647689) / (pow(r2, 2) + -.7607324991323768 * r2 + .132089632343748));
+	// ─── Refresh Bar Effect. ─────────────────────────────────────────────────────
+	#ifdef REFRESH_BAR_HEIGHT
+	#ifdef REFRESH_BAR_INTENSITY
+	float cycleDuration = 1 + REFRESH_BAR_HEIGHT * 2; // The refresh cycle duration.
+	// Position of the bottom of the refresh bar. Moves from -REFRESH_BAR_HEIGHT (completely over top) to 1 + REFRESH_BAR_HEIGHT (completely under bottom).
+	float barBottomY = fmod(Time / REFRESH_PERIOD, cycleDuration) - REFRESH_BAR_HEIGHT; // The bottom bar position.
+	float barTopY = barBottomY - REFRESH_BAR_HEIGHT; // The top bar position.
+	if (uv.y >= barTopY && uv.y <= barBottomY) // If the pixel is inside the refresh bar...
+		color.rgb += (smoothstep(0, 1, (barBottomY - texCoord.y) / REFRESH_BAR_HEIGHT) * REFRESH_BAR_INTENSITY);
 	#endif
+	#endif
+	// ─── Noise Effect. ───────────────────────────────────────────────────────────
+	#ifdef NOISE_INTENSITY
+	float x = (uv.x + 4) * (uv.y + 4) * (Time * 10);
+	float grain = (fmod((fmod(x, 13) + 1) * (fmod(x, 123) + 1), .01) - .005) * NOISE_INTENSITY;
+	color.rgb = color.rgb > .5 ? color.rgb - grain : color.rgb + grain;
+	#endif
+	// ─── Shadow Border Effect. ───────────────────────────────────────────────────
+	#ifdef SHADOW_BORDER_INTENSITY
+	#ifdef SHADOW_BORDER_LENGTH
+	float2 distToEdge = min(uv, 1 - uv); // Calculate the distance to the nearest edge (in range [0, .5]).
+	color.rgb *= lerp(1 - SHADOW_BORDER_INTENSITY, 1, smoothstep(0, SHADOW_BORDER_LENGTH, min(distToEdge.x, distToEdge.y))); // Create a smooth transition from the start of the border (SHADOW_BORDER_LENGTH) to the actual edge (0).
+	#endif
+	#endif
+	color.rgb = saturate(color.rgb); // Ensure that the colors are in the range 0 to 1.
 	return color;
 }
