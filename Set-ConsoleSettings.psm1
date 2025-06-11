@@ -539,9 +539,9 @@ function Set-ConsoleConfiguration {
 	)
 	$isAdmin = Assert-Admin
 	if ($isAdmin) {
-		Install-WingetPackage gsudo | Out-Null
-		Set-Alias -Name sudo -Value gsudo -Option ReadOnly, AllScope -Force # Set alias for gsudo
-		Write-Debug "Alias sudo set for gsudo.exe"
+		# Install-WingetPackage gsudo | Out-Null
+		# Set-Alias -Name sudo -Value gsudo -Option ReadOnly, AllScope -Force # Set alias for gsudo
+		# Write-Debug "Alias sudo set for gsudo.exe"
 	}
 	# ─── Load settings ──────────────────────────────────────────────────────────────
 	if (-not (Test-Path $File)) {
@@ -597,10 +597,14 @@ function Set-OhMyPosh {
 	param([string]$Theme)
 	$ohMyPoshThemesFolder = Join-Path $env:LOCALAPPDATA "Programs\oh-my-posh\themes"
 	# ─── Set Oh-My-Posh prompt ──────────────────────────────────────────────────
-	if (Install-WingetPackage oh-my-posh) {
-		if ($PSCmdlet.ShouldProcess("Import Oh My Posh themes")) {
-			Copy-Item (Join-Path $PSScriptRoot "settings\Oh-My-Posh\*.omp.json") $ohMyPoshThemesFolder
-			Write-Debug "Oh-My-Posh settings added."
+	if ((Get-Command oh-my-posh -ErrorAction SilentlyContinue).Count -eq 0) {
+		if ($PSCmdlet.ShouldProcess("Install Oh My Posh")) {
+			Install-WingetPackage JanDeDobbeleer.OhMyPosh # Install Oh-My-Posh package
+			Write-Debug "Oh-My-Posh installed."
+			if ($PSCmdlet.ShouldProcess("Import Oh My Posh themes")) {
+				Copy-Item (Join-Path $PSScriptRoot "settings\Oh-My-Posh\*.omp.json") $ohMyPoshThemesFolder
+				Write-Debug "Oh-My-Posh settings added."
+			}
 		}
 	}
 	if (-not (Test-Path $Theme)) { $Theme = Join-Path $ohMyPoshThemesFolder "$Theme.omp.json" }
@@ -611,7 +615,6 @@ function Set-OhMyPosh {
 		return
 	}
 	Write-Debug "Oh My Posh theme set to $Theme"
-	#(@(&(Join-Path $env:LOCALAPPDATA "Programs/oh-my-posh/bin/oh-my-posh.exe") init pwsh --config="luigitech.omp.json") -join "`n") | Invoke-Expression
 	oh-my-posh init pwsh --config $Theme | Invoke-Expression # Iinitalize Oh-My-Posh promt
 	Enable-PoshTooltips # Enable Oh-My-Posh tooltips
 	Write-Debug "Oh-My-Posh initialized."
